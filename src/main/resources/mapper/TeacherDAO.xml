@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mabatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etd.etdservice.dao.TeacherDAO">
+    <!-- 表名 -->
+    <sql id="tb_name">etd_db.teachers</sql>
+    <!--表中所有字段-->
+    <sql id="tb_columns">
+        `id`, `user_name`, `session_key`, `real_name`, `phone`, `email`,
+	    `create_time`, `avatar_url`, `description`
+	</sql>
+
+    <sql id="update_columns">
+        <set>
+            <if test="userName!=null"> `user_name`=#{userName}, </if>
+            <if test="sessionKey!=null"> `session_key`=#{sessionKey}, </if>
+            <if test="realName!=null">`real_name`=#{realName},</if>
+            <if test="phone!=null">`phone`=#{phone},</if>
+            <if test="email!=null">`email`=#{email},</if>
+            <if test="createTime!=null">`create_time`=#{createTime},</if>
+            <if test="avatarUrl!=null">`avatar_url`=#{avatarUrl},</if>
+            <if test="description!=null">`description`=#{description}</if>
+        </set>
+    </sql>
+
+    <select id="queryById" resultType="com.etd.etdservice.bean.users.Teacher">
+        SELECT <include refid="com.etd.etdservice.dao.TeacherDAO.tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.TeacherDAO.tb_name" />
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="queryByUserName" resultType="com.etd.etdservice.bean.users.Teacher">
+        SELECT <include refid="com.etd.etdservice.dao.TeacherDAO.tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.TeacherDAO.tb_name" />
+        WHERE `user_name` = #{userName}
+    </select>
+
+    <update id="update" parameterType="com.etd.etdservice.bean.users.Teacher">
+        UPDATE <include refid="com.etd.etdservice.dao.TeacherDAO.tb_name" />
+        <include refid="com.etd.etdservice.dao.TeacherDAO.update_columns" />
+        WHERE `id` = #{id}
+    </update>
+
+    <insert id="create" parameterType="com.etd.etdservice.bean.users.Teacher">
+        INSERT INTO <include refid="com.etd.etdservice.dao.TeacherDAO.tb_name" />
+        (`user_name`, `session_key`, `create_time`)
+        VALUES
+        (#{userName}, #{sessionKey}, #{createTime})
+    </insert>
+</mapper>
