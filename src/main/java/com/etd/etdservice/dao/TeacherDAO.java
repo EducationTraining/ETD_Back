@@ -12,6 +12,8 @@ public interface TeacherDAO {
 
 	Teacher queryByUserName(String userName);
 
+	Teacher queryBySessionKey(String sessionKey);
+
 	boolean update(Teacher teacher);
 
 	boolean create(Teacher teacher);

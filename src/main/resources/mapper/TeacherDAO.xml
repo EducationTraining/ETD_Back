@@ -18,7 +18,6 @@
             <if test="realName!=null">`real_name`=#{realName},</if>
             <if test="phone!=null">`phone`=#{phone},</if>
             <if test="email!=null">`email`=#{email},</if>
-            <if test="createTime!=null">`create_time`=#{createTime},</if>
             <if test="avatarUrl!=null">`avatar_url`=#{avatarUrl},</if>
             <if test="description!=null">`description`=#{description}</if>
         </set>
@@ -34,6 +33,12 @@
         SELECT <include refid="com.etd.etdservice.dao.TeacherDAO.tb_columns" />
         FROM <include refid="com.etd.etdservice.dao.TeacherDAO.tb_name" />
         WHERE `user_name` = #{userName}
+    </select>
+
+    <select id="queryBySessionKey" resultType="com.etd.etdservice.bean.users.Teacher">
+        SELECT <include refid="com.etd.etdservice.dao.TeacherDAO.tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.TeacherDAO.tb_name" />
+        WHERE `session_key` = #{SessionKey}
     </select>
 
     <update id="update" parameterType="com.etd.etdservice.bean.users.Teacher">

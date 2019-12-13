@@ -11,6 +11,8 @@ public interface StudentDAO {
 
 	Student queryByUserName(String userName);
 
+	Student queryBySessionKey(String sessionKey);
+
 	boolean update(Student student);
 
 	boolean create(Student student);

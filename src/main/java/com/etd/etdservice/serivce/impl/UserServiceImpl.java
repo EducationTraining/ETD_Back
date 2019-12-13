@@ -3,13 +3,20 @@ package com.etd.etdservice.serivce.impl;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
+import com.etd.etdservice.bean.users.requests.RequestUpdateStudent;
+import com.etd.etdservice.bean.users.requests.RequestUpdateTeacher;
+import com.etd.etdservice.bean.users.requests.RequestUploadAvatar;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
+import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import com.etd.etdservice.dao.StudentDAO;
 import com.etd.etdservice.dao.TeacherDAO;
 import com.etd.etdservice.serivce.UserService;
+import com.etd.etdservice.utils.FileHelper;
 import com.etd.etdservice.utils.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -20,6 +27,12 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private TeacherDAO teacherDAO;
+
+	@Value("${image_root_path}")
+	private String imageRootPath;
+
+	@Value("${urlStarter}")
+	private String urlStarter;
 
 	@Override
 	public ResponseRegister registerForStudent(String userName, String password) {
@@ -33,12 +46,13 @@ public class UserServiceImpl implements UserService {
 		}
 
 		Student registerStudent = new Student();
-		String sessionKey = MD5Util.getMD5String(password);
+		String sessionKey = MD5Util.getMD5String(userName + password);
 		registerStudent.setSessionKey(sessionKey);
 		registerStudent.setUserName(userName);
 		registerStudent.setCreateTime(new Date());
 		if (!studentDAO.create(registerStudent)) {
-			return new ResponseRegister(false, "cannot create student", null);
+			return new ResponseRegister(false,
+					"cannot create student", null);
 		}
 
 		return new ResponseRegister(true, "", sessionKey);
@@ -52,16 +66,18 @@ public class UserServiceImpl implements UserService {
 
 		Teacher resTeacher = teacherDAO.queryByUserName(userName);
 		if (resTeacher != null) {
-			return new ResponseRegister(false, "invalid userName", null);
+			return new ResponseRegister(false,
+					"invalid userName", null);
 		}
 
 		Teacher registerTeacher = new Teacher();
-		String sessionKey = MD5Util.getMD5String(password);
+		String sessionKey = MD5Util.getMD5String(userName + password);
 		registerTeacher.setSessionKey(sessionKey);
 		registerTeacher.setUserName(userName);
 		registerTeacher.setCreateTime(new Date());
 		if (!teacherDAO.create(registerTeacher)) {
-			return new ResponseRegister(false, "cannot create teacher", null);
+			return new ResponseRegister(false,
+					"cannot create teacher", null);
 		}
 
 		return new ResponseRegister(true, "", sessionKey);
@@ -79,7 +95,7 @@ public class UserServiceImpl implements UserService {
 				 	"invalid user name, may need register", null);
 		} else {
 			String resSessionKey = resStudent.getSessionKey();
-			if (resSessionKey.equals(MD5Util.getMD5String(password))) {
+			if (resSessionKey.equals(MD5Util.getMD5String(userName + password))) {
 				return new ResponseRegister(true, "",  resSessionKey);
 			} else {
 				return new ResponseRegister(false,
@@ -100,12 +116,64 @@ public class UserServiceImpl implements UserService {
 					"invalid user name, may need register", null);
 		} else {
 			String resSessionKey = resTeacher.getSessionKey();
-			if (resSessionKey.equals(MD5Util.getMD5String(password))) {
+			if (resSessionKey.equals(MD5Util.getMD5String(userName + password))) {
 				return new ResponseRegister(true, "",  resSessionKey);
 			} else {
 				return new ResponseRegister(false,
 						"invalid password", null);
 			}
+		}
+	}
+
+	@Override
+	public BaseResponse updateStudentInfo(RequestUpdateStudent request) {
+		return null;
+	}
+
+	@Override
+	public BaseResponse updateTeacherInfo(RequestUpdateTeacher request) {
+		return null;
+	}
+
+	@Override
+	public ResponseUploadAvatar uploadStudentAvatar(MultipartFile file, String sessionKey) {
+		if (file == null || sessionKey == null) {
+			return new ResponseUploadAvatar(false, "param error", null);
+		}
+
+		Student student = studentDAO.queryBySessionKey(sessionKey);
+		if (student == null) {
+			return new ResponseUploadAvatar(false, "invalid sessionKey", null);
+		}
+
+		try {
+			String avatarUrl = FileHelper.uploadPic(file, imageRootPath, "avatar", urlStarter);
+			student.setAvatarUrl(avatarUrl);
+			studentDAO.update(student);
+			return new ResponseUploadAvatar(true, "", avatarUrl);
+		} catch (Exception e) {
+			return new ResponseUploadAvatar(false, e.getMessage(), null);
+		}
+	}
+
+	@Override
+	public ResponseUploadAvatar uploadTeacherAvatar(MultipartFile file, String sessionKey) {
+		if (file == null || sessionKey == null) {
+			return new ResponseUploadAvatar(false, "param error", null);
+		}
+
+		Teacher teacher = teacherDAO.queryBySessionKey(sessionKey);
+		if (teacher == null) {
+			return new ResponseUploadAvatar(false, "invalid sessionKey", null);
+		}
+
+		try {
+			String avatarUrl = FileHelper.uploadPic(file, imageRootPath, "avatar", urlStarter);
+			teacher.setAvatarUrl(avatarUrl);
+			teacherDAO.update(teacher);
+			return new ResponseUploadAvatar(true, "", avatarUrl);
+		} catch (Exception e) {
+			return new ResponseUploadAvatar(false, e.getMessage(), null);
 		}
 	}
 }
