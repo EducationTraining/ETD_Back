@@ -1,6 +1,11 @@
 package com.etd.etdservice.web;
 
+import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.users.requests.RequestRegister;
+import com.etd.etdservice.bean.users.requests.RequestUpdateStudent;
+import com.etd.etdservice.bean.users.requests.RequestUpdateTeacher;
+import com.etd.etdservice.bean.users.response.ResponseGetStudent;
+import com.etd.etdservice.bean.users.response.ResponseGetTeacher;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import com.etd.etdservice.serivce.UserService;
@@ -52,5 +57,25 @@ public class UserController {
 	@RequestMapping(value = "/upload-avatar/student", method = RequestMethod.POST)
 	public ResponseUploadAvatar uploadAvatarForStudent(@RequestParam("file") MultipartFile file, @RequestParam("sessionKey") String sessionKey) {
 		return service.uploadStudentAvatar(file, sessionKey);
+	}
+
+	@RequestMapping(value = "/student", method = RequestMethod.POST)
+	public BaseResponse updateStudentInfo(@RequestBody RequestUpdateStudent request) {
+		return service.updateStudentInfo(request);
+	}
+
+	@RequestMapping(value = "/teacher", method = RequestMethod.POST)
+	public BaseResponse updateTeacherInfo(@RequestBody RequestUpdateTeacher request) {
+		return service.updateTeacherInfo(request);
+	}
+
+	@RequestMapping(value = "/session-key/{sessionKey}/student", method = RequestMethod.GET)
+	public ResponseGetStudent getStudentInfo(@PathVariable String sessionKey) {
+		return service.getStudentInfo(sessionKey);
+	}
+
+	@RequestMapping(value = "/session-key/{sessionKey}/teacher", method = RequestMethod.GET)
+	public ResponseGetTeacher getTeacherInfo(@PathVariable String sessionKey) {
+		return service.getTeacherInfo(sessionKey);
 	}
 }

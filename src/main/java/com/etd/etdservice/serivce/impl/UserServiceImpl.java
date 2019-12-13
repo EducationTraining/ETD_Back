@@ -5,6 +5,8 @@ import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.requests.RequestUpdateStudent;
 import com.etd.etdservice.bean.users.requests.RequestUpdateTeacher;
+import com.etd.etdservice.bean.users.response.ResponseGetStudent;
+import com.etd.etdservice.bean.users.response.ResponseGetTeacher;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import com.etd.etdservice.dao.StudentDAO;
@@ -132,7 +134,17 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public ResponseGetStudent getStudentInfo(String sessionKey) {
+		return null;
+	}
+
+	@Override
 	public BaseResponse updateTeacherInfo(RequestUpdateTeacher request) {
+		return null;
+	}
+
+	@Override
+	public ResponseGetTeacher getTeacherInfo(String sessionKey) {
 		return null;
 	}
 

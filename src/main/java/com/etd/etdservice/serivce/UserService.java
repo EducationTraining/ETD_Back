@@ -3,6 +3,8 @@ package com.etd.etdservice.serivce;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.users.requests.RequestUpdateStudent;
 import com.etd.etdservice.bean.users.requests.RequestUpdateTeacher;
+import com.etd.etdservice.bean.users.response.ResponseGetStudent;
+import com.etd.etdservice.bean.users.response.ResponseGetTeacher;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,11 +50,25 @@ public interface UserService {
 	BaseResponse updateStudentInfo(RequestUpdateStudent request);
 
 	/**
+	 * 获取学生信息
+	 * @param sessionKey 用户sessionKey
+	 * @return a ResponseGetStudent Object
+	 */
+	ResponseGetStudent getStudentInfo(String sessionKey);
+
+	/**
 	 * 更新老师信息
 	 * @param request a RequestUpdateTeacher Object
 	 * @return a BaseResponse Object
 	 */
 	BaseResponse updateTeacherInfo(RequestUpdateTeacher request);
+
+	/**
+	 * 获取老师信息
+	 * @param sessionKey 老师sessionKey
+	 * @return a ResponseGetTeacher Object
+	 */
+	ResponseGetTeacher getTeacherInfo(String sessionKey);
 
 	/**
 	 * 上传学生头像
