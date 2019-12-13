@@ -3,7 +3,6 @@ package com.etd.etdservice.serivce;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.users.requests.RequestUpdateStudent;
 import com.etd.etdservice.bean.users.requests.RequestUpdateTeacher;
-import com.etd.etdservice.bean.users.requests.RequestUploadAvatar;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import org.springframework.web.multipart.MultipartFile;

@@ -5,7 +5,6 @@ import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.requests.RequestUpdateStudent;
 import com.etd.etdservice.bean.users.requests.RequestUpdateTeacher;
-import com.etd.etdservice.bean.users.requests.RequestUploadAvatar;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import com.etd.etdservice.dao.StudentDAO;
@@ -13,6 +12,7 @@ import com.etd.etdservice.dao.TeacherDAO;
 import com.etd.etdservice.serivce.UserService;
 import com.etd.etdservice.utils.FileHelper;
 import com.etd.etdservice.utils.MD5Util;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Date;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 	@Autowired
 	private StudentDAO studentDAO;
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserService {
 	@Value("${image_root_path}")
 	private String imageRootPath;
 
-	@Value("${urlStarter}")
+	@Value("${url_starter}")
 	private String urlStarter;
 
 	@Override
@@ -147,10 +148,13 @@ public class UserServiceImpl implements UserService {
 		}
 
 		try {
-			String avatarUrl = FileHelper.uploadPic(file, imageRootPath, "avatar", urlStarter);
+			String avatarUrl = FileHelper.uploadPic(file, imageRootPath, "avatars", urlStarter);
 			student.setAvatarUrl(avatarUrl);
-			studentDAO.update(student);
-			return new ResponseUploadAvatar(true, "", avatarUrl);
+			if (studentDAO.update(student)) {
+				return new ResponseUploadAvatar(true, "", avatarUrl);
+			} else {
+				return new ResponseUploadAvatar(false, "update student failed", null);
+			}
 		} catch (Exception e) {
 			return new ResponseUploadAvatar(false, e.getMessage(), null);
 		}
@@ -168,10 +172,14 @@ public class UserServiceImpl implements UserService {
 		}
 
 		try {
-			String avatarUrl = FileHelper.uploadPic(file, imageRootPath, "avatar", urlStarter);
+			String avatarUrl = FileHelper.uploadPic(file, imageRootPath, "avatars", urlStarter);
 			teacher.setAvatarUrl(avatarUrl);
-			teacherDAO.update(teacher);
-			return new ResponseUploadAvatar(true, "", avatarUrl);
+			log.info(teacher.toString());
+			if (teacherDAO.update(teacher)) {
+				return new ResponseUploadAvatar(true, "", avatarUrl);
+			} else {
+				return new ResponseUploadAvatar(false, "update teacher failed", null);
+			}
 		} catch (Exception e) {
 			return new ResponseUploadAvatar(false, e.getMessage(), null);
 		}

@@ -1,16 +1,12 @@
 package com.etd.etdservice.web;
 
 import com.etd.etdservice.bean.users.requests.RequestRegister;
-import com.etd.etdservice.bean.users.requests.RequestUploadAvatar;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import com.etd.etdservice.serivce.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -49,16 +45,12 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/upload-avatar/teacher", method = RequestMethod.POST)
-	public ResponseUploadAvatar uploadAvatarForTeacher(@RequestBody RequestUploadAvatar request) {
-		MultipartFile file = request.getFile();
-		String sessionKey = request.getSessionKey();
+	public ResponseUploadAvatar uploadAvatarForTeacher(@RequestParam("file") MultipartFile file, @RequestParam("sessionKey") String sessionKey) {
 		return service.uploadTeacherAvatar(file, sessionKey);
 	}
 
 	@RequestMapping(value = "/upload-avatar/student", method = RequestMethod.POST)
-	public ResponseUploadAvatar uploadAvatarForStudent(@RequestBody RequestUploadAvatar request) {
-		MultipartFile file = request.getFile();
-		String sessionKey = request.getSessionKey();
+	public ResponseUploadAvatar uploadAvatarForStudent(@RequestParam("file") MultipartFile file, @RequestParam("sessionKey") String sessionKey) {
 		return service.uploadStudentAvatar(file, sessionKey);
 	}
 }

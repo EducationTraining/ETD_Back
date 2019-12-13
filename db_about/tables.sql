@@ -13,7 +13,7 @@ CREATE TABLE students(
   ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
   alter table students add sex varchar(32) COMMENT '性别';
   alter table students add valid boolean default true COMMENT '是否为有效用户';
-  
+  alter table students modify `avatar_url` varchar(512) COMMENT '用户头像';
   
  CREATE TABLE teachers(
   `id`  int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -27,3 +27,4 @@ CREATE TABLE students(
   `description` varchar(1024) COMMENT '介绍',
   UNIQUE KEY `user_name` (`user_name`) 
   ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  alter table teachers modify `avatar_url` varchar(512) COMMENT '用户头像';

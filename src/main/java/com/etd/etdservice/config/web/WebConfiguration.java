@@ -26,8 +26,8 @@ public class WebConfiguration implements WebMvcConfigurer{
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		// 图片存放路径
-		registry.addResourceHandler("/images/avartars/**").addResourceLocations("file:/home/webapp/EducationTraining/images/avartars");
-		registry.addResourceHandler("/images/others/**").addResourceLocations("file:/home/webapp/EducationTraining/images/others");
+		registry.addResourceHandler("/images/avatars/**").addResourceLocations("file:/home/webapp/EducationTraining/images/avatars/");
+		registry.addResourceHandler("/images/others/**").addResourceLocations("file:/home/webapp/EducationTraining/images/others/");
 		WebMvcConfigurer.super.addResourceHandlers(registry);
 	}
 
