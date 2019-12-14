@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mabatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etd.etdservice.dao.StudentDAO">
+    <!-- 表名 -->
+    <sql id="tb_name">etd_db.students</sql>
+    <!--表中所有字段-->
+    <sql id="tb_columns">
+        `id`, `user_name`, `session_key`, `real_name`, `phone`, `email`,
+	    `create_time`, `avatar_url`, `sex`, `valid`
+	</sql>
+    <!--更新语句-->
+    <sql id="update_columns">
+        <set>
+            <if test="userName!=null"> `user_name`=#{userName}, </if>
+            <if test="sessionKey!=null"> `session_key`=#{sessionKey}, </if>
+            <if test="realName!=null">`real_name`=#{realName},</if>
+            <if test="phone!=null">`phone`=#{phone},</if>
+            <if test="email!=null">`email`=#{email},</if>
+            <if test="avatarUrl!=null">`avatar_url`=#{avatarUrl},</if>
+            <if test="sex!=null">`sex`=#{sex}</if>
+        </set>
+    </sql>
+
+    <select id="queryById" resultType="com.etd.etdservice.bean.users.Student">
+		SELECT <include refid="tb_columns" />
+		FROM <include refid="com.etd.etdservice.dao.StudentDAO.tb_name" />
+		WHERE `id` = #{id} AND valid = true
+    </select>
+
+    <select id="queryByUserName" resultType="com.etd.etdservice.bean.users.Student">
+        SELECT <include refid="com.etd.etdservice.dao.StudentDAO.tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.StudentDAO.tb_name" />
+        WHERE `user_name` = #{userName} AND valid = true
+    </select>
+
+    <select id="queryBySessionKey" resultType="com.etd.etdservice.bean.users.Student">
+        SELECT <include refid="com.etd.etdservice.dao.StudentDAO.tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.StudentDAO.tb_name" />
+        WHERE `session_key` = #{sessionKey} AND valid = true
+    </select>
+
+    <update id="update" parameterType="com.etd.etdservice.bean.users.Student">
+        UPDATE <include refid="com.etd.etdservice.dao.StudentDAO.tb_name" />
+            <include refid="com.etd.etdservice.dao.StudentDAO.update_columns" />
+        WHERE `id` = #{id}
+    </update>
+
+    <insert id="create" parameterType="com.etd.etdservice.bean.users.Student">
+        INSERT INTO <include refid="com.etd.etdservice.dao.StudentDAO.tb_name" />
+        (`user_name`, `session_key`, `create_time`)
+        VALUES
+        (#{userName}, #{sessionKey}, #{createTime})
+    </insert>
+
+</mapper>

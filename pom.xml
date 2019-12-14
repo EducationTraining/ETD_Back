@@ -10,12 +10,13 @@
     </parent>
     <groupId>com.etd</groupId>
     <artifactId>etdservice</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>ETDService</name>
     <description>Backend support for ETD.</description>
 
     <properties>
+        <commons-lang3.version>3.5</commons-lang3.version>
         <java.version>1.8</java.version>
     </properties>
 
@@ -23,6 +24,19 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>1.2.5</version>
         </dependency>
 
         <dependency>
@@ -60,6 +74,12 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
         </dependency>
     </dependencies>
 
