@@ -43,6 +43,8 @@ CREATE TABLE students(
   `description` varchar(1024) COMMENT '课程介绍',
   `status` int(10) UNSIGNED DEFAULT 1 COMMENT '课程状态 0为正在审核 1为审核通过 2为审核不通过'
   ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  alter table courses modify `score` double DEFAULT 0 COMMENT '课程总评分';
+  alter table courses add `course_num` varchar(64) UNIQUE KEY COMMENT '课程编号';
   
   CREATE TABLE course_student(
   `id`  int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,

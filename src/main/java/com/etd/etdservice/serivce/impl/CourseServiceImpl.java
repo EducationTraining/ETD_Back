@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @Slf4j
 public class CourseServiceImpl implements CourseService {
+
 	@Override
 	public ResponseGetCourses getHottestCourses() {
 		return null;
@@ -36,7 +37,7 @@ public class CourseServiceImpl implements CourseService {
 	}
 
 	@Override
-	public BaseResponse updateCourseInfo(RequestUpdateCourse request, String sessionKey) {
+	public BaseResponse updateCourseInfo(RequestUpdateCourse request) {
 		return null;
 	}
 

@@ -40,7 +40,7 @@ public interface CourseService {
 	ResponseUploadAvatar uploadCoursePic(MultipartFile file, Integer courseId, String sessionKey);
 
 	/**
-	 * 更新课程信息
+	 * 更新课程信息 注意对startTime的处理
 	 * @param request a RequestUpdateCourse Object
 	 * @return
 	 */

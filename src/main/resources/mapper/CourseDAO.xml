@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mabatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etd.etdservice.dao.CourseDAO">
+    <!-- 表名 -->
+    <sql id="tb_name">etd_db.courses</sql>
+    <!--表中所有字段-->
+    <sql id="tb_columns">
+        `id`, `course_num`, `teacher_id`, `name`, `score`, `pages`, `start_time`,
+	    `weeks`, `status`, `description`, `create_time`, `note`, `avatar_url`
+	</sql>
+    <!--更新语句-->
+    <sql id="update_columns">
+        <set>
+            <if test="courseNum!=null"> `course_num`=#{courseNum}, </if>
+            <if test="name!=null"> `name`=#{name}, </if>
+            <if test="score!=null"> `score`=#{score}, </if>
+            <if test="pages!=null">`pages`=#{pages},</if>
+            <if test="startTime!=null">`start_time`=#{startTime},</if>
+            <if test="weeks!=null">`weeks`=#{weeks},</if>
+            <if test="avatarUrl!=null">`avatar_url`=#{avatarUrl},</if>
+            <if test="status!=null">`status`=#{status},</if>
+            <if test="description!=null">`description`=#{description},</if>
+            <if test="note!=null">`note`=#{note}</if>
+        </set>
+    </sql>
+
+    <select id="queryLatestCourses" resultType="com.etd.etdservice.bean.course.Course">
+		SELECT <include refid="tb_columns" />
+		FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
+		WHERE `status` = 1
+		ORDER BY `create_time`
+		DESC
+        LIMIT #{count}
+    </select>
+
+    <select id="queryHottestCourses" resultType="com.etd.etdservice.bean.course.Course">
+        SELECT <include refid="tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
+        WHERE `status` = 1
+        ORDER BY `score`
+        DESC
+        LIMIT #{count}
+    </select>
+
+    <select id="queryValidCourses" resultType="com.etd.etdservice.bean.course.Course">
+        SELECT <include refid="tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
+        WHERE `status` = 1
+    </select>
+
+    <select id="queryAllCourses" resultType="com.etd.etdservice.bean.course.Course">
+        SELECT <include refid="tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
+    </select>
+
+    <select id="queryByCourseNum" resultType="com.etd.etdservice.bean.course.Course">
+        SELECT <include refid="tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
+        WHERE #{courseNum} = `course_num`
+    </select>
+
+    <select id="queryById" resultType="com.etd.etdservice.bean.course.Course">
+        SELECT <include refid="tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
+        WHERE #{id} = `id`
+    </select>
+
+    <update id="update" parameterType="com.etd.etdservice.bean.course.Course">
+        UPDATE <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
+            <include refid="com.etd.etdservice.dao.CourseDAO.update_columns" />
+        WHERE `id` = #{id}
+    </update>
+
+    <insert id="create" parameterType="com.etd.etdservice.bean.course.Course">
+        INSERT INTO <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
+        (`teacher_id`, `course_num`, `name`, `pages`, `start_time`, `weeks`, `description`, `create_time`, `note`)
+        VALUES
+        (#{teacherId}, #{courseNum}, #{name}, #{pages}, #{startTime}, #{weeks}, #{description}, #{createTime}, #{note})
+    </insert>
+
+</mapper>

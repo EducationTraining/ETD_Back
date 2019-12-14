@@ -11,15 +11,17 @@ import java.util.List;
 @Mapper
 @Repository
 public interface CourseDAO {
+	Course queryById(int id);
+
 	/**
-	 * return count courses(use "limit #{count}" sql) order by field create_time.
+	 * return count courses(use "limit #{count}" sql) order by field create_time.(status = 1)
 	 * @param count
 	 * @return a course List contains at most count courses
 	 */
 	List<Course> queryLatestCourses(int count);
 
 	/**
-	 * return count courses(use "limit #{count}" sql) order by field score.
+	 * return count courses(use "limit #{count}" sql) order by field score.(status = 1)
 	 * @param count
 	 * @return a course List contains at most count courses
 	 */
@@ -36,6 +38,12 @@ public interface CourseDAO {
 	 * @return a Page<Course> Object
 	 */
 	Page<Course> queryAllCourses();
+
+	/**
+	 * 根据课程编号查课程
+	 * @return
+	 */
+	Course queryByCourseNum(String courseNum);
 
 	/**
 	 * update course, located by id.

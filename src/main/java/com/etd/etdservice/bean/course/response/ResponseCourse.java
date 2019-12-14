@@ -12,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 @AllArgsConstructor
 public class ResponseCourse {
 	int id;
+	private String courseNum;
 	private ResponseGetTeacher teacher;
 	private Integer studentNum;
 	private String name;

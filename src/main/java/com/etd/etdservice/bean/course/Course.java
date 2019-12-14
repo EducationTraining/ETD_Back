@@ -11,6 +11,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class Course {
 	private int id;
+	private String courseNum;
 	private Integer teacherId;
 	private String name;
 	private Double score;

@@ -23,7 +23,7 @@ public interface AdminDAO {
 	 * @return a Admin object
 	 */
 	Admin queryBySessionKey(String sessionKey);
-	
+
 	/**
 	 * update admin
 	 * @param admin a Admin Object
