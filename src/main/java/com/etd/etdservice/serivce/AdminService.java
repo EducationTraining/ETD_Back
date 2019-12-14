@@ -3,13 +3,12 @@ package com.etd.etdservice.serivce;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.users.response.ResponseGetAdmin;
-import com.etd.etdservice.bean.users.response.ResponseGetStudent;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
 
 public interface AdminService {
 	/**
 	 *
-	 * @param sessionKey
+	 * @param sessionKey 管理员sessionKey
 	 * @return
 	 */
 	ResponseGetCourses getAllCourses(String sessionKey);
@@ -18,14 +17,14 @@ public interface AdminService {
 	 *
 	 * @param courseId
 	 * @param status
-	 * @param sessionKey
+	 * @param sessionKey 管理员sessionKey
 	 * @return
 	 */
 	BaseResponse updateCourseStatus(Integer courseId, Integer status, String sessionKey);
 
 	/**
 	 *
-	 * @param sessionKey
+	 * @param sessionKey 管理员sessionKey
 	 * @return
 	 */
 	ResponseGetAdmin getAdminInfo(String sessionKey);
