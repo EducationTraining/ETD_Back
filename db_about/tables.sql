@@ -52,6 +52,7 @@ CREATE TABLE students(
   `student_id`  int(10) UNSIGNED NOT NULL,
   UNIQUE KEY (`course_id`, `student_id`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  alter table course_student add `create_time` datetime;
   
   CREATE TABLE course_student_remarks(
   `id`  int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,

@@ -1,7 +1,10 @@
 package com.etd.etdservice.dao;
 
+import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.Course;
+import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
+import com.etd.etdservice.serivce.CourseService;
 import com.etd.etdservice.utils.DoubleUtil;
 import com.etd.etdservice.utils.StringUtil;
 import com.github.pagehelper.Page;
@@ -25,14 +28,18 @@ import static org.junit.Assert.assertTrue;
 public class CourseDAOTest {
 	@Autowired
 	private CourseDAO courseDAO;
+
 	private static TeacherDAO teacherDAO;
 	@Autowired
 	public void setTeacherDAO(TeacherDAO teacherDAO){
 		this.teacherDAO = teacherDAO;
 	}
 
+
 	private static final int COURSE_NUM = 5;
 	private static final int COUNT = 5;
+
+
 
 	public static Course mockCourse() {
 		Course course = new Course();
@@ -102,5 +109,7 @@ public class CourseDAOTest {
 			assertEquals(1, (int) course.getStatus());
 		}
 	}
+
+
 
 }

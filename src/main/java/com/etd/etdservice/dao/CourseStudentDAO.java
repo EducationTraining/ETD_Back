@@ -23,4 +23,27 @@ public interface CourseStudentDAO {
 	 * @return success or not.
 	 */
 	boolean delete(CourseStudent courseStudent);
+
+	/**
+	 * 选课
+	 * @param courseStudent
+	 * @return
+	 */
+	boolean attendCourse(CourseStudent courseStudent);
+
+	/**
+	 * 退课
+	 * @param courseId
+	 * @param studentId
+	 * @return
+	 */
+	boolean withdrawCourse(Integer courseId, Integer studentId);
+
+	/**
+	 * 获取某学生是否参加了某门课程
+	 * @param courseId
+	 * @param studentId
+	 * @return
+	 */
+	CourseStudent isAttendCourse(Integer courseId, Integer studentId);
 }
