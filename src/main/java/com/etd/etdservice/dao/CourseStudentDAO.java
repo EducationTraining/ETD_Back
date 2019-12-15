@@ -23,4 +23,18 @@ public interface CourseStudentDAO {
 	 * @return success or not.
 	 */
 	boolean delete(CourseStudent courseStudent);
+
+	/**
+	 * query if the courseStudent exists.
+	 * @param courseStudent ignore id.
+	 * @return if exists, return itself, or NULL.
+	 */
+	CourseStudent queryExistOrNot(CourseStudent courseStudent);
+
+	/**
+	 * count student total number in a course.
+	 * @param courseId
+	 * @return the total number
+	 */
+	Integer queryStudentNumbersByCourseId(Integer courseId);
 }

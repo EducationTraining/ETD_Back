@@ -31,7 +31,7 @@ public class ResponseCourse {
 		}
 		response.setTeacher(teacher);
 		response.setStudentNum(studentNum);
-		BeanUtils.copyProperties(response, bean);
+		BeanUtils.copyProperties(bean, response);
 		return response;
 	}
 }
