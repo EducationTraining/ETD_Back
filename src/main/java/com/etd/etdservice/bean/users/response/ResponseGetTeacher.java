@@ -21,7 +21,7 @@ public class ResponseGetTeacher {
 
 	public static ResponseGetTeacher fromBeanToResponse(Teacher bean) {
 		ResponseGetTeacher response = new ResponseGetTeacher();
-		BeanUtils.copyProperties(response, bean);
+		BeanUtils.copyProperties(bean, response);
 		return response;
 	}
 }
