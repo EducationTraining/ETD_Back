@@ -22,7 +22,7 @@ public class ResponseGetStudent {
 	public static ResponseGetStudent fromBeanToResponse(Student bean) {
 		ResponseGetStudent response = new ResponseGetStudent();
 		// response.setLastestTwoCourses(...);
-		BeanUtils.copyProperties(response, bean);
+		BeanUtils.copyProperties(bean, response);
 		return response;
 	}
 }
