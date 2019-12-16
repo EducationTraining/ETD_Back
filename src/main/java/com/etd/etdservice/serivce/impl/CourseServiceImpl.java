@@ -2,8 +2,10 @@ package com.etd.etdservice.serivce.impl;
 
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.CourseStudent;
+import com.etd.etdservice.bean.CourseStudentRemark;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
+import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
 import com.etd.etdservice.bean.users.Student;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -146,7 +149,18 @@ public class CourseServiceImpl implements CourseService {
 	 */
 	@Override
 	public ResponseGetCourses getAttendedCourses(String sessionKey) {
-		return null;
+		if (sessionKey == null) {
+			return new ResponseGetCourses(false, "param error",null);
+		}
+		//根据学生sessionKey获取学生id
+		Student student = studentDAO.queryBySessionKey(sessionKey);
+		Integer studentId = student.getId();
+
+		List<ResponseCourse> responseCourses = courseStudentDAO.getAttendedCourses(studentId);
+
+		ResponseGetCourses attendedCourses = new ResponseGetCourses(true, "", responseCourses);
+
+		return attendedCourses;
 	}
 
 	/**
@@ -157,6 +171,12 @@ public class CourseServiceImpl implements CourseService {
 	 */
 	@Override
 	public ResponseGetStudent getAttendStudents(Integer courseId, String sessionKey) {
+
+		//List<Student> students = courseStudentDAO.getAttendStudents(courseId);
+
+		//ResponseGetStudent  attendStudents = new ResponseGetStudent();
+		//ResponseGetStudent.fromBeanToResponse(students,attendStudents);
+
 		return null;
 	}
 
@@ -168,6 +188,30 @@ public class CourseServiceImpl implements CourseService {
 	 */
 	@Override
 	public BaseResponse remarkCourse(RequestRemarkCourse request) {
-		return null;
+		Integer courseId = request.getCourseId();  //课程ID
+		String sessionKey = request.getSessionKey(); //学生sessionKey
+		String remark = request.getRemark(); //课程评价
+		Double score = request.getScore();  //课程评分
+		//根据学生sessionKey获取学生id
+		Student student = studentDAO.queryBySessionKey(sessionKey);
+		Integer studentId = student.getId();
+
+		//判断该学生是否选择了待评价课程（是否有权限评价）
+		CourseStudent attendCourse = courseStudentDAO.isAttendCourse(courseId, studentId);
+
+		if(null!=attendCourse){
+			CourseStudentRemark courseStudentRemark = new CourseStudentRemark(0, courseId, studentId, remark, score);
+
+			boolean status = courseStudentDAO.remarkCourse(courseStudentRemark);
+
+			if(status == true){
+				//评价成功
+				return new BaseResponse(true,"");
+			}else{
+				//评价失败
+				return new BaseResponse(false,"remarkCourse failed");
+			}
+		}else return new BaseResponse(false,"not attend the course");
+
 	}
 }

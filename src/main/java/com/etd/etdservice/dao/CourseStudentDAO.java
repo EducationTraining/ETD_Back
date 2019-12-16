@@ -1,6 +1,11 @@
 package com.etd.etdservice.dao;
 
 import com.etd.etdservice.bean.CourseStudent;
+import com.etd.etdservice.bean.CourseStudentRemark;
+import com.etd.etdservice.bean.course.Course;
+import com.etd.etdservice.bean.course.response.ResponseCourse;
+import com.etd.etdservice.bean.course.response.ResponseGetCourses;
+import lombok.experimental.var;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -46,4 +51,23 @@ public interface CourseStudentDAO {
 	 * @return
 	 */
 	CourseStudent isAttendCourse(Integer courseId, Integer studentId);
+
+	/**
+	 * 获取某学生参加了的课程
+	 * @param studentId
+	 * @return
+	 */
+	List<ResponseCourse> getAttendedCourses(Integer studentId);
+
+	/**
+	 * 获取某门课参加的学生
+	 */
+
+
+	/**
+	 * 对某门课进行评价
+	 * @param courseStudentRemark
+	 * @return
+	 */
+    boolean remarkCourse(CourseStudentRemark courseStudentRemark);
 }

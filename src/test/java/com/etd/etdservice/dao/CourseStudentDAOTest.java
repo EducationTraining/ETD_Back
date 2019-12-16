@@ -1,7 +1,11 @@
 package com.etd.etdservice.dao;
 
 import com.etd.etdservice.bean.BaseResponse;
+import com.etd.etdservice.bean.CourseStudentRemark;
 import com.etd.etdservice.bean.course.Course;
+import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
+import com.etd.etdservice.bean.course.response.ResponseCourse;
+import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
@@ -54,7 +58,7 @@ public class CourseStudentDAOTest {
 
     //学生选课测试
     @Test
-    public void attendCourse(){
+    public void attendCourseTest(){
         //mock一个学生并插入students表中
         Student student = UserDAOTest.mockStudent();
         studentDAO.create(student);
@@ -72,7 +76,7 @@ public class CourseStudentDAOTest {
 
     //学生退课测试
     @Test
-    public void withdrawCourse(){
+    public void withdrawCourseTest(){
         //mock一个学生并插入students表中
         Student student = UserDAOTest.mockStudent();
         studentDAO.create(student);
@@ -92,7 +96,7 @@ public class CourseStudentDAOTest {
 
     //获取某学生是否参加了某门课程测试
     @Test
-    public void isAttendCourse(){
+    public void isAttendCourseTest(){
         //mock一个学生并插入students表中
         Student student = UserDAOTest.mockStudent();
         studentDAO.create(student);
@@ -109,5 +113,28 @@ public class CourseStudentDAOTest {
         assertEquals(attendCourse.isSuccess(),true);
         assertEquals(attendCourse.isSuccess(),true);
         assertEquals(attendCourse.getErrMsg(),"");
+    }
+
+    //获取某学生参加了的课程
+    @Test
+    public void getAttendedCoursesTest(){
+        ResponseGetCourses responseGetCourses = courseService.getAttendedCourses("testSessionKeymTaGAxt1Sl");
+        //ResponseGetCourses responseGetCourses = courseService.getAttendedCourses(null);
+        for (ResponseCourse responseCourse : responseGetCourses.getCoursesList()) {
+            System.out.println(responseCourse);
+        }
+    }
+
+    //对某门课进行评价
+    @Test
+    public void remarkCourseTest(){
+
+
+       //这里测试我是用的自己数据库的数据
+        RequestRemarkCourse remark = new RequestRemarkCourse(1118,"testSessionKeymTaGAxt1Sl","课程评价",99.4);
+
+        BaseResponse baseResponse = courseService.remarkCourse(remark);
+        assertEquals(baseResponse.isSuccess(),true);
+        assertEquals("",baseResponse.getErrMsg());
     }
 }

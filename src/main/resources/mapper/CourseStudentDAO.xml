@@ -56,4 +56,46 @@
         WHERE course_id=#{param1} AND student_id=#{param2}
     </select>
 
+    <!--获取某学生参加了的课程-->
+    <resultMap id="responseCoursesMap" type="ResponseCourse">
+        <id property="id" column="id"></id>
+        <result property="courseNum" column="course_num"></result>
+        <result property="studentNum" column="studentNum"></result>
+        <result property="name" column="name"></result>
+        <result property="score" column="score"></result>
+        <result property="pages" column="pages"></result>
+        <result property="startTime" column="startTime"></result>
+        <result property="weeks" column="weeks"></result>
+        <result property="description" column="description"></result>
+        <result property="note" column="note"></result>
+        <result property="avatarUrl" column="avatarUrl"></result>
+        <association property="teacher" javaType="ResponseGetTeacher">
+            <id property="id" column="id"></id>
+            <result property="userName" column="user_name"></result>
+            <result property="realName" column="realName"></result>
+            <result property="phone" column="phone"></result>
+            <result property="email" column="email"></result>
+            <result property="avatarUrl" column="avatarUrl"></result>
+            <result property="description" column="description"></result>
+        </association>
+    </resultMap>
+
+    <!--获取某学生参加了的课程 （四表查询，course_student,courses,teacher,student）-->
+    <select id="getAttendedCourses" resultMap="responseCoursesMap">
+        SELECT DISTINCT c.`id`,c.`course_num`,
+        t.`id`,t.`user_name`,t.`real_name`,t.`phone`,t.`email`,t.`avatar_url`,t.`description`,
+        s.`id` AS studentNum,
+        c.`name`,c.`score`,c.`pages`,c.`start_time`,c.`weeks`,c.`description`,c.`note`,c.`avatar_url`
+        FROM course_student cs,courses c,teachers t,students s
+        WHERE cs.`student_id`=#{studentId} AND s.`id`=#{studentId} AND cs.`course_id` = c.`id` AND c.`teacher_id`=t.`id`;
+    </select>
+
+    <!--对某门课进行评价-->
+    <insert id="remarkCourse">
+       INSERT INTO course_student_remarks
+        (course_id,student_id,score,remark)
+       VALUES
+      (#{courseId},#{studentId},#{score},#{remark})
+    </insert>
+
 </mapper>
