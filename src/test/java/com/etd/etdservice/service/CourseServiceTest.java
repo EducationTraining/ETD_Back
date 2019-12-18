@@ -15,9 +15,7 @@ import com.etd.etdservice.dao.UserDAOTest;
 import com.etd.etdservice.serivce.CourseService;
 import com.etd.etdservice.serivce.impl.CourseServiceImpl;
 import com.etd.etdservice.utils.DoubleUtil;
-import com.etd.etdservice.utils.FileHelper;
 import com.etd.etdservice.utils.StringUtil;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +26,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.util.Date;
 import java.util.List;
@@ -159,10 +156,6 @@ public class CourseServiceTest {
         ResponseUploadAvatar responseUploadAvatar =
                 courseService.uploadCoursePic(file, course.getId(), teacher.getSessionKey());
 
-        System.out.println("-----------------------------------");
-        System.out.println(responseUploadAvatar + "\n" + responseUploadAvatar.getErrMsg());
-        System.out.println("-----------------------------------");
-
         Assert.assertNotNull(responseUploadAvatar);
         Assert.assertTrue(responseUploadAvatar.isSuccess());
         String expectedAvatarUrl =
@@ -171,7 +164,7 @@ public class CourseServiceTest {
 
         String filePath = imageRootPath + "/"+CourseServiceImpl.COURSE_TYPE+"/" + file.getOriginalFilename();
         File uploadedFile = new File(filePath);
-        System.out.println("--------: " + uploadedFile.getPath() + "  -------");
+        log.info("Test uploaded file's path: " + uploadedFile.getAbsolutePath());
         Assert.assertTrue(uploadedFile.exists());
     }
 
@@ -211,5 +204,17 @@ public class CourseServiceTest {
         Assert.assertEquals(mockCourse.getDescription(), course.getDescription());
         Assert.assertEquals(mockCourse.getNote(), course.getNote());
         Assert.assertEquals(mockCourse.getAvatarUrl(), course.getAvatarUrl());
+
+        //测试course部分更新
+        request.setStartTime(null);
+        request.setWeeks(null);
+        request.setDescription(null);
+        response = courseService.updateCourseInfo(request);
+        Assert.assertTrue(response.isSuccess());
+
+        //设置错误courseId，应当无法更新，返回false
+        request.setCourseId(49521354);
+        response = courseService.updateCourseInfo(request);
+        Assert.assertFalse(response.isSuccess());
     }
 }

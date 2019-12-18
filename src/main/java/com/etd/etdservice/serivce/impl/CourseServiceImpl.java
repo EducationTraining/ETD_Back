@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,7 +66,7 @@ public class CourseServiceImpl implements CourseService {
 	private static ResponseGetCourses fromCourses(List<Course> courses){
 		List<ResponseCourse> courseList = new ArrayList<>();
 		if(courses == null || courses.size() == 0){
-			return new ResponseGetCourses(false, "no hottest courses!", courseList);
+			return new ResponseGetCourses(false, "no selected courses!", courseList);
 		}
 		for(Course course : courses){
 			Teacher teacher = teacherDAO.queryById(course.getTeacherId());
@@ -119,13 +118,15 @@ public class CourseServiceImpl implements CourseService {
 		try{
 			avatarUrl = FileHelper.uploadPic(file, imageRootPath, COURSE_TYPE, urlStarter);
 		}catch (Exception e){
-			log.error(e.getMessage());
+			log.warn("课程图片上传失败！\n" + e.getMessage());
 			return new ResponseUploadAvatar(false, "upload course picture failed.\n" + e.getMessage(), null);
 		}
 		course.setAvatarUrl(avatarUrl);
 		if(courseDAO.update(course)){
+			log.info("teacher (id: " + teacher.getId() + ") update course (id: " + course.getId() + ") successfully.");
 			return new ResponseUploadAvatar(true, "", avatarUrl);
 		}else{
+			log.warn("teacher (id: " + teacher.getId() + ") try to update course(id: " + course.getId() + ") but fail!");
 			return new ResponseUploadAvatar(false, "update course failed", null);
 		}
 	}
@@ -149,15 +150,21 @@ public class CourseServiceImpl implements CourseService {
 		}
 		course.setName(request.getName());
 		course.setPages(request.getPages());
-		course.setStartTime(new Date(request.getStartTime()));
+		if(request.getStartTime() != null){
+			course.setStartTime(new Date(request.getStartTime()));
+		}else {
+			course.setStartTime(null);
+		}
 		course.setWeeks(request.getWeeks());
 		course.setStatus(request.getStatus());
 		course.setDescription(request.getDescription());
 		course.setNote(request.getNote());
 		course.setAvatarUrl(request.getAvatarUrl());
 		if(courseDAO.update(course)){
+			log.info("teacher (id: " + teacher.getId() + ") update course (id: " + course.getId() + ") successfully.");
 			return new BaseResponse(true, "courseInfo update");
 		}else{
+			log.warn("teacher (id: " + teacher.getId() + ") try to update course(id: " + course.getId() + ") but fail!");
 			return new BaseResponse(false, "update courseInfo failed");
 		}
 	}
