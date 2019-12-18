@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mabatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etd.etdservice.dao.CourseStudentDAO">
+    <!-- 表名-->
+    <sql id="tb_name">etd_db.course_student</sql>
+    <!-- 表中所有字段 -->
+    <sql id="tb_columns">
+        `id`,`course_id`,`student_id`
+    </sql>
+
+    <insert id="create" parameterType="com.etd.etdservice.bean.CourseStudent">
+        INSERT INTO <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name" />
+        (`course_id`, `student_id`)
+        VALUES
+        (#{courseId}, #{studentId})
+    </insert>
+
+    <delete id="delete" parameterType="com.etd.etdservice.bean.CourseStudent">
+        DELETE FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name" />
+        WHERE `course_id` = #{courseId} AND `student_id` = #{studentId}
+    </delete>
+
+    <select id="queryExistOrNot" parameterType="com.etd.etdservice.bean.CourseStudent"
+            resultType="com.etd.etdservice.bean.CourseStudent">
+        SELECT <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_columns"/>
+        FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name"/>
+        WHERE `course_id` = #{courseId} AND `student_id` = #{studentId}
+    </select>
+
+    <select id="queryStudentNumbersByCourseId" parameterType="Integer"
+            resultType="Integer">
+        SELECT COUNT(*) AS studentNumber
+        FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name"/>
+        WHERE `course_id` = #{course_id}
+    </select>
+
+</mapper>
