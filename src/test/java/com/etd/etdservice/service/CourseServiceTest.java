@@ -171,6 +171,9 @@ public class CourseServiceTest {
     @Test
     public void testUpdateCourseInfo(){
         Course mockCourse = mockCourse();
+        //course与mockCourse都是随机生成的。
+        // 将course插入数据库，然后用mockCourse的信息作为course的更新信息
+        //更新后比对course更新后的信息与mockCourse是否一致
         Course course = mockCourse();
         mockCourse.setStatus(1);
         courseDAO.create(course);
@@ -179,9 +182,26 @@ public class CourseServiceTest {
         Teacher teacher = teacherDAO.queryById(course.getTeacherId());
 
         RequestUpdateCourse request = new RequestUpdateCourse();
+
+        //无传入信息，应当返回false
+        BaseResponse response = courseService.updateCourseInfo(request);
+        Assert.assertFalse(response.isSuccess());
+
+        //只有老师的sessionKey，无courseId，返回false
         request.setSessionKey(teacher.getSessionKey());
+        response = courseService.updateCourseInfo(request);
+        Assert.assertFalse(response.isSuccess());
+
+        //老师的sessionKey和课程的courseId都有
         request.setCourseId(course.getId());
+        response = courseService.updateCourseInfo(request);
+        Assert.assertTrue(response.isSuccess());
+
+        //只更新一项
         request.setName(mockCourse.getName());
+        response = courseService.updateCourseInfo(request);
+        Assert.assertTrue(response.isSuccess());
+
         request.setPages(mockCourse.getPages());
         request.setStartTime(mockCourse.getStartTime().getTime());
         request.setWeeks(mockCourse.getWeeks());
@@ -191,7 +211,7 @@ public class CourseServiceTest {
         request.setAvatarUrl(mockCourse.getAvatarUrl());
         request.setCourseId(course.getId());
 
-        BaseResponse response = courseService.updateCourseInfo(request);
+        response = courseService.updateCourseInfo(request);
         Assert.assertTrue(response.isSuccess());
 
         course = courseDAO.queryById(course.getId());
