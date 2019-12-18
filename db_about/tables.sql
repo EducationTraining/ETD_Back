@@ -52,6 +52,7 @@ CREATE TABLE students(
   `student_id`  int(10) UNSIGNED NOT NULL,
   UNIQUE KEY (`course_id`, `student_id`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  alter table course_student add `create_time` datetime;
   
   CREATE TABLE course_student_remarks(
   `id`  int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -60,6 +61,16 @@ CREATE TABLE students(
   `score` double NOT NULL COMMENT '打分',
   `remark` varchar(512) COMMENT '评价',
   UNIQUE KEY (`course_id`, `student_id`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+  CREATE TABLE admins(
+  `id`  int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `user_name` varchar(32) NOT NULL COMMENT '用户名',
+  `session_key` varchar(32) NOT NULL DEFAULT '' COMMENT '由密码加密而来的sessionKey',
+  `phone` varchar(32) COMMENT '电话',
+  `email` varchar(64) COMMENT '邮箱',
+  `create_time` datetime NOT NULL COMMENT '注册时间',
+  UNIQUE KEY `user_name` (`user_name`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
   
