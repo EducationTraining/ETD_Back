@@ -58,4 +58,10 @@ public interface CourseDAO {
 	 * @return success or not
 	 */
 	boolean create(Course course);
+
+	/**
+	 * 删除所有课程，此方法用于测试
+	 * @return
+	 */
+	boolean deleteAll();
 }

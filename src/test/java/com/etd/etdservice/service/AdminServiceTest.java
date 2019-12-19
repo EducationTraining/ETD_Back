@@ -85,7 +85,9 @@ public class AdminServiceTest {
 
     @Test
     public void testGetAllCourses() {
-        // 先插入一条教师信息，并取得该教师的完整信息（包括id）
+        //先清空课程表
+        courseDAO.deleteAll();
+        // 插入一条教师信息，并取得该教师的完整信息（包括id）
         Course course;
         Integer MAX_VALUE = 100000000;
         Teacher teacher = new Teacher();
@@ -100,7 +102,7 @@ public class AdminServiceTest {
         String adminName = "" + new Random().nextInt(MAX_VALUE);
         String adminPassWord = "" + new Random().nextInt(MAX_VALUE);
         String sessionKey = adminService.register(adminName,adminPassWord).getSessionKey();
-        // 插入10条课程信息
+        // 插入10条有效课程信息
         for(int i = 0; i<10; i++) {
             course = new Course();
             course.setName("" + i);
@@ -108,10 +110,23 @@ public class AdminServiceTest {
             course.setCreateTime(new Date());
             courseDAO.create(course);
         }
+        // 插入一条无效课程信息
+        course = new Course();
+        course.setName("invalidCourse");
+        course.setTeacherId(MAX_VALUE);
+        course.setCreateTime(new Date());
+        courseDAO.create(course);
         // 调用service层getAllCourses方法
         ResponseGetCourses courses = adminService.getAllCourses(sessionKey);
         // 判断返回结果是否符合预期
         assertTrue(courses.isSuccess());
+        assertEquals(10, courses.getCoursesList().size());
+        if(courses.getCoursesList().size()==10) {
+            for(int i = 0; i<10; i++) {
+                assertEquals(Integer.valueOf(i).toString(), courses.getCoursesList().get(i).getName());
+            }
+        }
+
     }
 
     @Test
