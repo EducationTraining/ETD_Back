@@ -73,6 +73,10 @@
         WHERE `id` = #{id}
     </update>
 
+    <delete id="deleteAll">
+        DELETE FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name"/>
+    </delete>
+
     <insert id="create" parameterType="com.etd.etdservice.bean.course.Course">
         INSERT INTO <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
         (`teacher_id`, `course_num`, `name`, `pages`, `start_time`, `weeks`, `description`, `create_time`, `note`)

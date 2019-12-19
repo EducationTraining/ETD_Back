@@ -71,7 +71,7 @@ public class CourseServiceImpl implements CourseService {
 		for(Course course : courses){
 			Teacher teacher = teacherDAO.queryById(course.getTeacherId());
 			ResponseGetTeacher responseGetTeacher = ResponseGetTeacher.fromBeanToResponse(teacher);
-			Integer studentNum = courseStudentDAO.queryStudentNumbersByCourseId(course.getId());
+			Integer studentNum = courseStudentDAO.getStudentCountsByCourseId(course.getId());
 
 			ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(course, responseGetTeacher, studentNum);
 			courseList.add(responseCourse);

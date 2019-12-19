@@ -10,6 +10,14 @@ import java.util.List;
 @Mapper
 @Repository
 public interface CourseStudentDAO {
+
+	/**
+	 * 传入一个CourseStudent类型的对象，返回表中匹配的记录
+	 * @param courseStudent
+	 * @return
+	 */
+	CourseStudent getByCourseStudent(CourseStudent courseStudent);
+
 	/**
 	 * insert a Course Student Object(选课记录).
 	 * @param courseStudent
@@ -25,16 +33,9 @@ public interface CourseStudentDAO {
 	boolean delete(CourseStudent courseStudent);
 
 	/**
-	 * query if the courseStudent exists.
-	 * @param courseStudent ignore id.
-	 * @return if exists, return itself, or NULL.
-	 */
-	CourseStudent queryExistOrNot(CourseStudent courseStudent);
-
-	/**
-	 * count student total number in a course.
+	 * 根据课程id号返回选课学生的数量
 	 * @param courseId
-	 * @return the total number
+	 * @return
 	 */
-	Integer queryStudentNumbersByCourseId(Integer courseId);
+	Integer getStudentCountsByCourseId(int courseId);
 }
