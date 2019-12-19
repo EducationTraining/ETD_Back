@@ -130,17 +130,56 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public BaseResponse updateStudentInfo(RequestUpdateStudent request) {
-		return null;
+		if (request.getSessionKey() == null) {
+			return new BaseResponse(false, "no sessionKey!");
+		}
+		Student student = studentDAO.queryBySessionKey(request.getSessionKey());
+		if (student == null) {
+			return new BaseResponse(false, "invalid sessionKey!");
+		}
+
+		student.setUserName(request.getUserName());
+		student.setRealName(request.getRealName());
+		student.setPhone(request.getPhone());
+		student.setEmail(request.getEmail());
+		student.setSex(request.getSex());
+
+		if (studentDAO.update(student)) {
+			return new BaseResponse(true, "");
+		}
+		log.warn("can not update studentInfo, studentId (" + student.getId() + ")");
+		return new BaseResponse(false, "update student information error");
 	}
 
 	@Override
 	public ResponseGetStudent getStudentInfo(String sessionKey) {
+		if (sessionKey == null) {
+			return null;
+		}
 		return null;
 	}
 
 	@Override
 	public BaseResponse updateTeacherInfo(RequestUpdateTeacher request) {
-		return null;
+		if (request.getSessionKey() == null) {
+			return new BaseResponse(false, "no sessionKey!");
+		}
+		Teacher teacher = teacherDAO.queryBySessionKey(request.getSessionKey());
+		if(teacher == null) {
+			return new BaseResponse(false, "invalid sessionKey!");
+		}
+
+		teacher.setUserName(request.getUserName());
+		teacher.setRealName(request.getRealName());
+		teacher.setPhone(request.getPhone());
+		teacher.setEmail(request.getEmail());
+		teacher.setDescription(request.getDescription());
+
+		if(teacherDAO.update(teacher)) {
+			return new BaseResponse(true, "");
+		}
+		log.warn("can not update studentInfo, studentId (" + teacher.getId() + ")");
+		return new BaseResponse(false, "update student information error");
 	}
 
 	@Override
