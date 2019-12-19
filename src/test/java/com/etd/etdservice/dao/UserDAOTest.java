@@ -5,6 +5,7 @@ import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.utils.MD5Util;
 import com.etd.etdservice.utils.StringUtil;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +89,21 @@ public class UserDAOTest {
 		teacherDAO.update(resTeacher);
 		resTeacher = teacherDAO.queryById(resTeacher.getId());
 		assertEquals(resTeacher.getUserName(), updatedUserName);
+	}
+
+	@Test
+	public void testDeleteTeacherById() {
+		// 删除测试可能会导致相关联的信息不完整，需要删除相关联的课程
+		// 但是本mockTeacher方法并没有创建课程，因此直接删除老师
+		Teacher mockTeacher = mockTeacher();
+		teacherDAO.create(mockTeacher);
+
+		mockTeacher = teacherDAO.queryBySessionKey(mockTeacher.getSessionKey());
+		Assert.assertNotNull(mockTeacher);
+
+		// 删除后老师应当不存在
+		teacherDAO.deleteTeacherById(mockTeacher.getId());
+		Assert.assertNull(teacherDAO.queryById(mockTeacher.getId()));
 	}
 
 	@Test

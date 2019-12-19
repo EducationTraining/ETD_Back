@@ -64,4 +64,11 @@ public interface CourseDAO {
 	 * @return
 	 */
 	boolean deleteAll();
+
+	/**
+	 * 根据传入的课程id删除课程
+	 * @param id 课程的id
+	 * @return
+	 */
+	boolean deleteByCourseId(int id);
 }

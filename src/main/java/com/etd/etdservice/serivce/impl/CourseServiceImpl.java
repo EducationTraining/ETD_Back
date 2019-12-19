@@ -63,13 +63,15 @@ public class CourseServiceImpl implements CourseService {
 
 	public static final int LATEST_COURSE_NUMBER = 5;
 
-	private static ResponseGetCourses fromCourses(List<Course> courses){
+	private static ResponseGetCourses fromCourses(List<Course> courses) {
 		List<ResponseCourse> courseList = new ArrayList<>();
-		if(courses == null || courses.size() == 0){
+		if(courses == null || courses.size() == 0) {
 			return new ResponseGetCourses(false, "no selected courses!", courseList);
 		}
-		for(Course course : courses){
+		for(Course course : courses) {
 			Teacher teacher = teacherDAO.queryById(course.getTeacherId());
+			log.info("teacher: " + teacher + " course: " + course);
+
 			ResponseGetTeacher responseGetTeacher = ResponseGetTeacher.fromBeanToResponse(teacher);
 			Integer studentNum = courseStudentDAO.getStudentCountsByCourseId(course.getId());
 

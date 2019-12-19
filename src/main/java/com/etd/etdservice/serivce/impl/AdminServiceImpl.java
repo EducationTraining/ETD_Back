@@ -53,10 +53,10 @@ public class AdminServiceImpl implements AdminService {
         // 获取所有课程
         Page<Course> courses = courseDAO.queryAllCourses();
         List<ResponseCourse> coursesList = new ArrayList<ResponseCourse>();
-        for(Course course :courses) {
+        for(Course course : courses) {
             // 获取每门课程的教师信息
             Teacher teacher = teacherDAO.queryById(course.getTeacherId());
-            //若教师信息不存在，则此门课程无效，丢弃该课程
+            // 若教师信息不存在，则此门课程无效，丢弃该课程
             if(teacher == null) {
                 continue;
             }

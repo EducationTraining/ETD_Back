@@ -12,8 +12,11 @@ import com.etd.etdservice.dao.CourseDAO;
 import com.etd.etdservice.dao.TeacherDAO;
 import com.etd.etdservice.serivce.AdminService;
 import com.etd.etdservice.serivce.UserService;
+import com.etd.etdservice.utils.DoubleUtil;
 import com.etd.etdservice.utils.MD5Util;
+import com.etd.etdservice.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,35 +88,49 @@ public class AdminServiceTest {
 
     @Test
     public void testGetAllCourses() {
-        //先清空课程表
+        // 先清空课程表
         courseDAO.deleteAll();
         // 插入一条教师信息，并取得该教师的完整信息（包括id）
         Course course;
         Integer MAX_VALUE = 100000000;
         Teacher teacher = new Teacher();
-        String nameOfTeacher = "" + new Random().nextInt(MAX_VALUE);
-        String sessionKeyOfTeacher = "" + new Random().nextInt(MAX_VALUE);
+        String nameOfTeacher = StringUtil.generateRandomString("teacherUserName");
+        String sessionKeyOfTeacher = StringUtil.generateRandomString("teacherSessionKey");
         teacher.setUserName(nameOfTeacher);
         teacher.setSessionKey(sessionKeyOfTeacher);
         teacher.setCreateTime(new Date());
         teacherDAO.create(teacher);
         teacher = teacherDAO.queryBySessionKey(sessionKeyOfTeacher);
         // 插入一条管理员信息，并取得该管理员的sessionKey
-        String adminName = "" + new Random().nextInt(MAX_VALUE);
-        String adminPassWord = "" + new Random().nextInt(MAX_VALUE);
+        String adminName = StringUtil.generateRandomString("adminName");
+        String adminPassWord = StringUtil.generateRandomString("teacherPassword");
         String sessionKey = adminService.register(adminName,adminPassWord).getSessionKey();
+
+        int RANDOM_COURSE_NAME = new Random().nextInt(MAX_VALUE) + MAX_VALUE;
         // 插入10条有效课程信息
         for(int i = 0; i<10; i++) {
             course = new Course();
-            course.setName("" + i);
+            // 每次的课程名称都不一样，避免无法插入，
+            // 但是每次的课程名称都应该明确，不能完全随机
+            course.setName("courseName" + String.valueOf(RANDOM_COURSE_NAME + i));
             course.setTeacherId(teacher.getId());
             course.setCreateTime(new Date());
+            course.setTeacherId(teacher.getId());
+            course.setCourseNum(StringUtil.generateRandomString("courseNum"));
+            course.setAvatarUrl(StringUtil.generateRandomString("avatarUrl"));
+            course.setCreateTime(new Date());
+            course.setStartTime(new Date());
+            course.setDescription(StringUtil.generateRandomString("description"));
+            course.setNote(StringUtil.generateRandomString("note"));
+            course.setPages(StringUtil.generateRandomString("pages"));
+            course.setScore(DoubleUtil.nextDouble(0, 5));
             courseDAO.create(course);
         }
         // 插入一条无效课程信息
         course = new Course();
-        course.setName("invalidCourse");
-        course.setTeacherId(MAX_VALUE);
+        int invalidTeacherId = new Random().nextInt(MAX_VALUE) + MAX_VALUE;
+        course.setTeacherId(invalidTeacherId);
+        course.setCourseNum(StringUtil.generateRandomString("courseNum"));
         course.setCreateTime(new Date());
         courseDAO.create(course);
         // 调用service层getAllCourses方法
@@ -123,10 +140,15 @@ public class AdminServiceTest {
         assertEquals(10, courses.getCoursesList().size());
         if(courses.getCoursesList().size()==10) {
             for(int i = 0; i<10; i++) {
-                assertEquals(Integer.valueOf(i).toString(), courses.getCoursesList().get(i).getName());
+                assertEquals("courseName" + String.valueOf(RANDOM_COURSE_NAME + i), courses.getCoursesList().get(i).getName());
             }
         }
+        // 删除无效信息
+        course = courseDAO.queryByCourseNum(course.getCourseNum());
+        courseDAO.deleteByCourseId(course.getId());
 
+        course = courseDAO.queryById(course.getId());
+        Assert.assertNull(course);
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.etd.etdservice.utils.DoubleUtil;
 import com.etd.etdservice.utils.StringUtil;
 import com.github.pagehelper.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,4 +104,19 @@ public class CourseDAOTest {
 		}
 	}
 
+	@Test
+	public void testDeleteByCourseId() {
+		// 删除测试可能会导致相关联的信息不完整，虽然mockCourse方法会创建老师，
+		// 但是它们之间的关系是：老师可以没有课程，但是课程必定属于一个老师
+		// 因此可以直接删除课程
+		Course mockCourse = mockCourse();
+		courseDAO.create(mockCourse);
+		mockCourse = courseDAO.queryByCourseNum(mockCourse.getCourseNum());
+		Assert.assertNotNull(mockCourse);
+		// 删除课程，判断不存在
+		courseDAO.deleteByCourseId(mockCourse.getId());
+		mockCourse = courseDAO.queryById(mockCourse.getId());
+		Assert.assertNull(mockCourse);
+
+	}
 }

@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -80,8 +81,8 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void testGetHottestCourses(){
-        for(int i = 0; i < COURSE_NUM; ++i){
+    public void testGetHottestCourses() {
+        for(int i = 0; i < COURSE_NUM; ++i) {
             Course mockCourse = CourseServiceTest.mockCourse();
             courseDAO.create(mockCourse);
         }
@@ -90,6 +91,7 @@ public class CourseServiceTest {
         Course mockCourse = courses.get(0);
         mockCourse.setStatus(1);
         mockCourse.setScore(5.0);
+        log.info("modified course: " + mockCourse);
 
         courseDAO.update(mockCourse);
 
@@ -99,8 +101,8 @@ public class CourseServiceTest {
 
         boolean flag = false;
         List<ResponseCourse> courseList = responseGetCourses.getCoursesList();
-        for(ResponseCourse course : courseList){
-            if(course.getCourseNum().equals(mockCourse.getCourseNum())){
+        for(ResponseCourse course : courseList) {
+            if(course.getId() == mockCourse.getId()){
                 flag = true;
             }
         }
