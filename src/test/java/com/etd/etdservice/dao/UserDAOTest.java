@@ -3,6 +3,7 @@ package com.etd.etdservice.dao;
 import com.etd.etdservice.bean.users.Admin;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
+import com.etd.etdservice.utils.MD5Util;
 import com.etd.etdservice.utils.StringUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,8 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -92,25 +92,23 @@ public class UserDAOTest {
 
 	@Test
 	public void testAdmin() {
+		//测试create和queryByUserName方法
 		Admin admin = mockAdmin();
 		adminDAO.create(admin);
-
-		Admin resAdmin=adminDAO.queryByUserName(admin.getUserName());
+		Admin resAdmin = adminDAO.queryByUserName(admin.getUserName());
 		assertTrue(resAdmin.getId() > 0);
 		assertEquals(resAdmin.getUserName(), admin.getUserName());
+		//测试queryById方法
 		resAdmin = adminDAO.queryById(resAdmin.getId());
 		assertEquals(resAdmin.getSessionKey(), admin.getSessionKey());
-		resAdmin=adminDAO.queryBySessionKey(admin.getSessionKey());
-		assertEquals(resAdmin.getUserName(),admin.getUserName());
-
+		//测试queryBySessionKey方法
+		resAdmin  =adminDAO.queryBySessionKey(admin.getSessionKey());
+		assertEquals(resAdmin.getUserName(), admin.getUserName());
+		//测试update方法
 		String updatedUserName = "updated" + resAdmin.getUserName();
 		resAdmin.setUserName(updatedUserName);
 		adminDAO.update(resAdmin);
 		resAdmin = adminDAO.queryById(resAdmin.getId());
-		assertEquals(resAdmin.getUserName(),updatedUserName);
-
-
-
-
+		assertEquals(resAdmin.getUserName(), updatedUserName);
 	}
 }

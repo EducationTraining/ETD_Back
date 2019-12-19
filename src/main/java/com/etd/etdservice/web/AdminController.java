@@ -1,6 +1,9 @@
 package com.etd.etdservice.web;
 
 
+import com.etd.etdservice.bean.BaseResponse;
+import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
+import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.users.requests.RequestRegister;
 import com.etd.etdservice.bean.users.response.ResponseGetAdmin;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
@@ -35,6 +38,19 @@ public class AdminController {
         return service.getLoginInfo(userName, password);
     }
 
+    @RequestMapping(value = "/session-key/{sessionKey}/admin/getCourses", method = RequestMethod.POST)
+    public ResponseGetCourses getAllCourses(@PathVariable String sessionKey) {
+        return service.getAllCourses(sessionKey);
+    }
 
+
+
+    @RequestMapping(value = "/update/course", method = RequestMethod.POST)
+    public BaseResponse updateCourse(@RequestBody RequestUpdateCourse requestUpdateCourse) {
+        Integer courseId = requestUpdateCourse.getCourseId();
+        Integer status = requestUpdateCourse.getStatus();
+        String sessionKey = requestUpdateCourse.getSessionKey();
+        return service.updateCourseStatus(courseId, status, sessionKey);
+    }
 
 }

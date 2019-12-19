@@ -34,23 +34,33 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private CourseStudentDAO courseStudentDAO;
 
+    /**
+     * 管理员获取所有课程
+     * @param sessionKey 管理员sessionKey
+     * @return
+     */
     @Override
     public ResponseGetCourses getAllCourses(String sessionKey) {
+        //如果sessionKey为null，则直接返回失败
         if (sessionKey == null) {
             return new ResponseGetCourses(false, "sessionKey error", null);
         }
-        Admin resAdmin=adminDAO.queryBySessionKey(sessionKey);
+        //如果该sessionKey不存在，返回失败：没有管理员权限
+        Admin resAdmin = adminDAO.queryBySessionKey(sessionKey);
         if(resAdmin==null){
             return new ResponseGetCourses(false,"Admin not found !",null);
         }
+        //获取所有课程
         Page<Course> courses = courseDAO.queryAllCourses();
-        List<ResponseCourse> coursesList=new ArrayList<ResponseCourse>();
+        List<ResponseCourse> coursesList = new ArrayList<ResponseCourse>();
         for(Course course :courses)
         {
-            Teacher teacher=teacherDAO.queryById(course.getId());
-            ResponseGetTeacher responseGetTeacher=ResponseGetTeacher.fromBeanToResponse(teacher);
-            int num_stu=courseStudentDAO.getStudentCountsByCourseId(course.getId());
-            ResponseCourse responseCourse=ResponseCourse.fromBeanToResponse(course,responseGetTeacher,num_stu);
+            //获取每门课程的教师信息
+            Teacher teacher = teacherDAO.queryById(course.getTeacherId());
+            ResponseGetTeacher responseGetTeacher = ResponseGetTeacher.fromBeanToResponse(teacher);
+            //获取每门课的学生数量
+            int num_stu = courseStudentDAO.getStudentCountsByCourseId(course.getId());
+            ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(course,responseGetTeacher,num_stu);
             coursesList.add(responseCourse);
         }
         return new ResponseGetCourses(true,"",coursesList);
@@ -58,25 +68,30 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public BaseResponse updateCourseStatus(Integer courseId, Integer status, String sessionKey) {
-        BaseResponse baseResponse=new BaseResponse();
+        BaseResponse baseResponse = new BaseResponse();
+        //如果session为null，返回失败
         if (sessionKey == null) {
             baseResponse.setSuccess(false);
             baseResponse.setErrMsg("sessionKey error !");
             return baseResponse;
         }
-        Admin resAdmin=adminDAO.queryBySessionKey(sessionKey);
+        //如果该sesionKey不存在，返回失败：没有管理员权限
+        Admin resAdmin = adminDAO.queryBySessionKey(sessionKey);
         if(resAdmin==null){
             baseResponse.setSuccess(false);
             baseResponse.setErrMsg("Admin not found !");
             return baseResponse;
         }
-        Course course=courseDAO.queryById(courseId);
+        //获取该课程，并修改状态
+        Course course = courseDAO.queryById(courseId);
         course.setStatus(status);
         if(courseDAO.update(course))
         {
+            //修改成功，返回成功
             baseResponse.setSuccess(true);
             return baseResponse;
         }
+        //修改失败，返回失败
         baseResponse.setSuccess(false);
         baseResponse.setErrMsg("error !");
         return baseResponse;
@@ -84,11 +99,15 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public ResponseGetAdmin getAdminInfo(String sessionKey) {
-        if(sessionKey==null)
+        //若sessionKey为null或者sessionKey不存在，则返回null
+        if(sessionKey==null) {
             return null;
-        Admin admin=adminDAO.queryBySessionKey(sessionKey);
-        if(admin==null)
+        }
+        Admin admin  =adminDAO.queryBySessionKey(sessionKey);
+        if(admin==null) {
             return null;
+        }
+        //封装管理员信息并返回
         ResponseGetAdmin responseGetAdmin=new ResponseGetAdmin();
         responseGetAdmin.setUserName(admin.getUserName());
         responseGetAdmin.setEmail(admin.getEmail());
@@ -98,46 +117,51 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public ResponseRegister register(String userName, String password) {
-
+        //若用户名或密码为null，返回失败
         if (userName == null || password == null) {
             return new ResponseRegister(false, "param error", null);
         }
-
+        //若该用户名已存在，返回失败
         Admin resAdmin  = adminDAO.queryByUserName(userName);
         if (resAdmin != null) {
             return new ResponseRegister(false, "invalid userName", null);
         }
+        //封装Admin对象并插入表中
         Admin registerAdmin = new Admin();
         String sessionKey = MD5Util.getMD5String(userName + password);
         registerAdmin.setSessionKey(sessionKey);
         registerAdmin.setUserName(userName);
         registerAdmin.setCreateTime(new Date());
+        //插入失败，返回失败
         if (!adminDAO.create(registerAdmin)) {
             return new ResponseRegister(false, "cannot create student", null);
         }
-
+        //插入成功，返回成功
         return new ResponseRegister(true, "", sessionKey);
     }
 
     @Override
     public ResponseRegister getLoginInfo(String userName, String password) {
-
+        //若用户名或密码为null，返回失败
         if (userName == null || password == null) {
             return new ResponseRegister(false, "param error", null);
         }
-
+        //若该用户名不存在，返回失败
         Admin resAdmin = adminDAO.queryByUserName(userName);
         if (resAdmin == null) {
             return new ResponseRegister(false,
                     "invalid user name, may need register", null);
-        } else {
-            String resSessionKey = resAdmin.getSessionKey();
-            if (resSessionKey.equals(MD5Util.getMD5String(userName + password))) {
+        }
+        //获取管理员信息
+        String resSessionKey = resAdmin.getSessionKey();
+        //验证用户名和密码是否正确，正确则返回正确
+        if (resSessionKey.equals(MD5Util.getMD5String(userName + password))) {
                 return new ResponseRegister(true, "",  resSessionKey);
-            } else {
+        }
+        //用户名和密码不正确
+        else {
                 return new ResponseRegister(false,
                         "invalid password", null);
-            }
         }
     }
 }

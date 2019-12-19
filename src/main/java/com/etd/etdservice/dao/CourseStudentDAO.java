@@ -38,6 +38,4 @@ public interface CourseStudentDAO {
 	 * @return
 	 */
 	Integer getStudentCountsByCourseId(int courseId);
-
-
 }
