@@ -318,7 +318,7 @@ public class CourseServiceImpl implements CourseService {
 		Teacher teacher = teacherDAO.queryBySessionKey(sessionKey);
 		int teacherId = teacher.getId();
 		Course course = courseDAO.queryById(courseId);
-		if (teacherId == course.getTeacherId()){
+		if (teacherId == course.getTeacherId()) {
 			// 如果是，根据courseId查询选课学生
 			List<Student> attendStudents = courseStudentDAO.getAttendStudents(courseId);
 			 List<ResponseGetStudent> studentsList = new ArrayList<>();

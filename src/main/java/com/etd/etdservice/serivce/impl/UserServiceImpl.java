@@ -130,12 +130,15 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public BaseResponse updateStudentInfo(RequestUpdateStudent request) {
+		BaseResponse response = new BaseResponse();
 		if (request.getSessionKey() == null) {
-			return new BaseResponse(false, "no sessionKey!");
+			response.setFailResponse(BaseResponse.NULL_SESSION_KEY);
+			return response;
 		}
 		Student student = studentDAO.queryBySessionKey(request.getSessionKey());
 		if (student == null) {
-			return new BaseResponse(false, "invalid sessionKey!");
+			response.setFailResponse(BaseResponse.NULL_STUDENT);
+			return response;
 		}
 
 		student.setUserName(request.getUserName());
@@ -153,20 +156,26 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResponseGetStudent getStudentInfo(String sessionKey) {
+		ResponseGetStudent response = new ResponseGetStudent();
 		if (sessionKey == null) {
-			return null;
+			response.setFailResponse(BaseResponse.NULL_SESSION_KEY);
+			return  response;
 		}
-		return null;
+		Student student = studentDAO.queryBySessionKey(sessionKey);
+		return ResponseGetStudent.fromBeanToResponse(student);
 	}
 
 	@Override
 	public BaseResponse updateTeacherInfo(RequestUpdateTeacher request) {
+		BaseResponse response = new BaseResponse();
 		if (request.getSessionKey() == null) {
-			return new BaseResponse(false, "no sessionKey!");
+			response.setFailResponse(BaseResponse.NULL_SESSION_KEY);
+			return response;
 		}
 		Teacher teacher = teacherDAO.queryBySessionKey(request.getSessionKey());
 		if(teacher == null) {
-			return new BaseResponse(false, "invalid sessionKey!");
+			response.setFailResponse(BaseResponse.NULL_TEACHER);
+			return response;
 		}
 
 		teacher.setUserName(request.getUserName());
@@ -184,7 +193,13 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResponseGetTeacher getTeacherInfo(String sessionKey) {
-		return null;
+		if(sessionKey == null) {
+			ResponseGetTeacher response = new ResponseGetTeacher();
+			response.setFailResponse(BaseResponse.NULL_SESSION_KEY);
+			return response;
+		}
+		Teacher teacher = teacherDAO.queryBySessionKey(sessionKey);
+		return ResponseGetTeacher.fromBeanToResponse(teacher);
 	}
 
 	@Override
