@@ -17,4 +17,11 @@ public interface TeacherDAO {
 	boolean update(Teacher teacher);
 
 	boolean create(Teacher teacher);
+
+	/**
+	 * 根据老师id删除该老师
+	 * @param id
+	 * @return
+	 */
+	boolean deleteTeacherById(int id);
 }
