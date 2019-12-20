@@ -3,37 +3,82 @@
         PUBLIC "-//mabatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.etd.etdservice.dao.CourseStudentDAO">
-    <!-- 表名-->
+    <!-- 表名 -->
     <sql id="tb_name">etd_db.course_student</sql>
-    <!-- 表中所有字段 -->
+    <!--表中所有字段-->
     <sql id="tb_columns">
-        `id`,`course_id`,`student_id`
-    </sql>
+        `id`, `course_id`, `student_id`,`create_time`
+	</sql>
 
-    <insert id="create" parameterType="com.etd.etdservice.bean.CourseStudent">
+    <select id="getStudentCountsByCourseId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name" />
+        WHERE `course_id` = #{courseId}
+    </select>
+
+    <insert id = "create" parameterType="com.etd.etdservice.bean.CourseStudent">
         INSERT INTO <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name" />
-        (`course_id`, `student_id`)
+        (`course_id`, `student_id`,`create_time`)
         VALUES
-        (#{courseId}, #{studentId})
+        (#{courseId}, #{studentId},#{createTime})
     </insert>
 
     <delete id="delete" parameterType="com.etd.etdservice.bean.CourseStudent">
-        DELETE FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name" />
+        DELETE
+        FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name"/>
         WHERE `course_id` = #{courseId} AND `student_id` = #{studentId}
     </delete>
 
-    <select id="queryExistOrNot" parameterType="com.etd.etdservice.bean.CourseStudent"
-            resultType="com.etd.etdservice.bean.CourseStudent">
+    <select id="getByCourseStudent" parameterType="com.etd.etdservice.bean.CourseStudent" resultType="com.etd.etdservice.bean.CourseStudent">
         SELECT <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_columns"/>
         FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name"/>
         WHERE `course_id` = #{courseId} AND `student_id` = #{studentId}
     </select>
 
-    <select id="queryStudentNumbersByCourseId" parameterType="Integer"
-            resultType="Integer">
-        SELECT COUNT(*) AS studentNumber
+    <!--选课-->
+    <insert id="attendCourse">
+        INSERT INTO <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name"/>
+        (course_id,student_id,create_time)
+        VALUES
+        (#{courseId},#{studentId},#{createTime})
+    </insert>
+
+    <!--退课-->
+    <delete id="withdrawCourse">
+        DELETE FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name"/>
+        where course_id=#{param1} AND student_id=#{param2}
+    </delete>
+
+    <!--获取某学生是否参加了某门课程-->
+    <select id="isAttendCourse" resultType="CourseStudent">
+        SELECT <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_columns"/>
         FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name"/>
-        WHERE `course_id` = #{course_id}
+        WHERE course_id=#{param1} AND student_id=#{param2}
     </select>
+
+    <!--根据学生ID查询课程ID-->
+    <select id="queryCourseIdByStudentId" parameterType="int" resultType="int">
+        SELECT course_id
+        FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name"/>
+        WHERE student_id = #{studentId};
+    </select>
+
+
+    <!--对某门课进行评价-->
+    <insert id="remarkCourse">
+       INSERT INTO course_student_remarks
+        (course_id,student_id,score,remark)
+       VALUES
+      (#{courseId},#{studentId},#{score},#{remark})
+    </insert>
+
+    <!--获取某门课参加的学生-->
+    <select id="getAttendStudents" resultType="Student">
+      SELECT s.*
+      FROM course_student cs,students s
+      WHERE course_id = #{courseId}
+       AND cs.student_id = s.id ;
+    </select>
+
 
 </mapper>
