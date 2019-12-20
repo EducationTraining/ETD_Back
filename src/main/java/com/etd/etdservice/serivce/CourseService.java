@@ -6,6 +6,7 @@ import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
 import com.etd.etdservice.bean.users.response.ResponseGetStudent;
+import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -83,7 +84,7 @@ public interface CourseService {
 	 * @param sessionKey 老师sessionKey
 	 * @return
 	 */
-	ResponseGetStudent getAttendStudents(Integer courseId, String sessionKey);
+	ResponseGetStudents getAttendStudents(Integer courseId, String sessionKey);
 
 	/**
 	 * 对某门课进行评价

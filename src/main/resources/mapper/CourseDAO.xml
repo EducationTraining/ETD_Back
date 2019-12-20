@@ -89,4 +89,10 @@
         (#{teacherId}, #{courseNum}, #{name}, #{pages}, #{startTime}, #{weeks}, #{description}, #{createTime}, #{note})
     </insert>
 
+    <select id="queryTeacherByCourseId" resultType="Teacher">
+        SELECT t.*
+        FROM courses c, teachers t
+        WHERE c.`id` = #{courseId} AND c.`teacher_id`=t.`id`;
+    </select>
+
 </mapper>
