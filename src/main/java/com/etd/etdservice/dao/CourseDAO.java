@@ -65,9 +65,23 @@ public interface CourseDAO {
 	boolean create(Course course);
 
 	/**
-	 * queryTeacherByCourseId
+	 * 根据课程ID查询任课老师
 	 * @param courseId
 	 * @return Teacher
 	 */
 	Teacher queryTeacherByCourseId(Integer courseId);
+
+	/**
+	 * 删除所有课程，此方法用于测试
+	 * @return
+	 */
+	boolean deleteAll();
+
+	/**
+	 * 根据传入的课程id删除课程
+	 * @param id 课程的id
+	 * @return
+	 */
+	boolean deleteByCourseId(int id);
+
 }

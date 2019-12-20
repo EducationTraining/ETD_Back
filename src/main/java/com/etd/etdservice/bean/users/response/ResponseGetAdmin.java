@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseGetAdmin {
+	private boolean success = true;
+	private String errMsg;
 	private String userName;
 	private String phone;
 	private String email;

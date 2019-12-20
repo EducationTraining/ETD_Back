@@ -16,7 +16,7 @@
         WHERE `course_id` = #{courseId}
     </select>
 
-    <insert id="create" parameterType="com.etd.etdservice.bean.CourseStudent">
+    <insert id = "create" parameterType="com.etd.etdservice.bean.CourseStudent">
         INSERT INTO <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name" />
         (`course_id`, `student_id`,`create_time`)
         VALUES
@@ -79,5 +79,6 @@
       WHERE course_id = #{courseId}
        AND cs.student_id = s.id ;
     </select>
+
 
 </mapper>
