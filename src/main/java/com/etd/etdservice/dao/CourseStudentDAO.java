@@ -5,6 +5,7 @@ import com.etd.etdservice.bean.CourseStudentRemark;
 import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
+import com.etd.etdservice.bean.users.Student;
 import lombok.experimental.var;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -57,12 +58,12 @@ public interface CourseStudentDAO {
 	 * @param studentId
 	 * @return
 	 */
-	List<ResponseCourse> getAttendedCourses(Integer studentId);
+	List<Course> getAttendedCourses(Integer studentId);
 
 	/**
 	 * 获取某门课参加的学生
 	 */
-
+	List<Student> getAttendStudents(Integer courseId);
 
 	/**
 	 * 对某门课进行评价
@@ -70,4 +71,7 @@ public interface CourseStudentDAO {
 	 * @return
 	 */
     boolean remarkCourse(CourseStudentRemark courseStudentRemark);
+
+	List<Integer> queryCourseIdByStudentId(Integer studentId);
+
 }

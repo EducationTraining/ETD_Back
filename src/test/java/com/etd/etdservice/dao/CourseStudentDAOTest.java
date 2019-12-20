@@ -1,6 +1,7 @@
 package com.etd.etdservice.dao;
 
 import com.etd.etdservice.bean.BaseResponse;
+import com.etd.etdservice.bean.CourseStudent;
 import com.etd.etdservice.bean.CourseStudentRemark;
 import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
@@ -12,6 +13,7 @@ import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.serivce.CourseService;
 import com.etd.etdservice.utils.DoubleUtil;
 import com.etd.etdservice.utils.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,121 +22,93 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 
 import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Slf4j
 public class CourseStudentDAOTest {
     @Autowired
-    private StudentDAO studentDAO;
+    private CourseStudentDAO courseStudentDAO;
     @Autowired
     private CourseDAO courseDAO;
 
-    private  static TeacherDAO teacherDAO;
-    @Autowired
-    public void setTeacherDAO(TeacherDAO teacherDAO){
-        this.teacherDAO = teacherDAO;
-    }
-    @Autowired
-    private CourseService courseService;
-
-    public static Course mockCourse() {
-        Course course = new Course();
-        Teacher teacher  = UserDAOTest.mockTeacher();
-        teacherDAO.create(teacher);
-        Teacher teacherRes = teacherDAO.queryByUserName(teacher.getUserName());
-        course.setTeacherId(teacherRes.getId());
-        course.setCourseNum(StringUtil.generateRandomString("courseNUm"));
-        course.setAvatarUrl(StringUtil.generateRandomString("avatarUrl"));
-        course.setCreateTime(new Date());
-        course.setStartTime(new Date());
-        course.setDescription(StringUtil.generateRandomString("description"));
-        course.setName(StringUtil.generateRandomString("name"));
-        course.setNote(StringUtil.generateRandomString("note"));
-        course.setPages(StringUtil.generateRandomString("pages"));
-        course.setScore(DoubleUtil.nextDouble(0, 5));
-        return course;
+    public static CourseStudent mockCourseStudent() {
+        CourseStudent courseStudent = new CourseStudent();
+        int MAX_VALUE = 10000000;
+        courseStudent.setCourseId(new Random().nextInt(MAX_VALUE));
+        courseStudent.setStudentId(new Random().nextInt(MAX_VALUE));
+        courseStudent.setCreateTime(new Date());
+        return courseStudent;
     }
 
-    //学生选课测试
+    public static CourseStudentRemark mockCourseStudentRemark() {
+        CourseStudentRemark courseStudentRemark = new CourseStudentRemark();
+        int MAX_VALUE = 10000000;
+        courseStudentRemark.setCourseId(new Random().nextInt(MAX_VALUE));
+        courseStudentRemark.setStudentId(new Random().nextInt(MAX_VALUE));
+        courseStudentRemark.setRemark("testRemark");
+        courseStudentRemark.setScore(99.5);
+        return courseStudentRemark;
+    }
+
+    // 学生选课测试
     @Test
     public void attendCourseTest(){
-        //mock一个学生并插入students表中
-        Student student = UserDAOTest.mockStudent();
-        studentDAO.create(student);
-        String sessionKey = student.getSessionKey();
-        //mock一门课并插入courses表中
-        Course course = mockCourse();
-        courseDAO.create(course);
-        //获取courseId
-        int courseId = courseDAO.queryByCourseNum(course.getCourseNum()).getId();
-
-        BaseResponse baseResponse = courseService.attendCourse(courseId, sessionKey);
-        assertEquals(baseResponse.isSuccess(),true);
-        assertEquals("",baseResponse.getErrMsg());
+        CourseStudent courseStudent = mockCourseStudent();
+        boolean status = courseStudentDAO.attendCourse(courseStudent);
+        assertEquals(true,status);
     }
 
-    //学生退课测试
+    // 学生退课测试
     @Test
     public void withdrawCourseTest(){
-        //mock一个学生并插入students表中
-        Student student = UserDAOTest.mockStudent();
-        studentDAO.create(student);
-        String sessionKey = student.getSessionKey();
-        //mock一门课并插入courses表中
-        Course course = mockCourse();
-        courseDAO.create(course);
-        //获取courseId
-        int courseId = courseDAO.queryByCourseNum(course.getCourseNum()).getId();
-        //先插入选课表
-        courseService.attendCourse(courseId, sessionKey);
-        //再删除选课表
-        BaseResponse baseResponse = courseService.withdrawCourse(courseId,sessionKey);
-        assertEquals(baseResponse.isSuccess(),true);
-        assertEquals("",baseResponse.getErrMsg());
+        CourseStudent courseStudent = mockCourseStudent();
+        int studentId = courseStudent.getStudentId();
+        int courseId = courseStudent.getCourseId();
+        courseStudentDAO.attendCourse(courseStudent);
+        boolean status = courseStudentDAO.withdrawCourse(courseId, studentId);
+        assertEquals(true,status);
     }
 
-    //获取某学生是否参加了某门课程测试
+    // 获取某学生是否参加了某门课程
     @Test
     public void isAttendCourseTest(){
-        //mock一个学生并插入students表中
-        Student student = UserDAOTest.mockStudent();
-        studentDAO.create(student);
-        String sessionKey = student.getSessionKey();
-        //mock一门课并插入courses表中
-        Course course = mockCourse();
-        courseDAO.create(course);
-        //获取courseId
-        int courseId = courseDAO.queryByCourseNum(course.getCourseNum()).getId();
-        //先插入选课表
-        courseService.attendCourse(courseId, sessionKey);
-        //再查询
-        ResponseIsAttendCourse attendCourse = courseService.isAttendCourse(courseId,sessionKey);
-        assertEquals(attendCourse.isSuccess(),true);
-        assertEquals(attendCourse.isSuccess(),true);
-        assertEquals(attendCourse.getErrMsg(),"");
+        CourseStudent courseStudent = mockCourseStudent();
+        int studentId = courseStudent.getStudentId();
+        int courseId = courseStudent.getCourseId();
+        courseStudentDAO.attendCourse(courseStudent);
+        CourseStudent attendCourse = courseStudentDAO.isAttendCourse(courseId, studentId);
+        assertEquals(courseStudent.getCourseId(),attendCourse.getCourseId());
+        assertEquals(courseStudent.getStudentId(),attendCourse.getStudentId());
     }
 
-    //获取某学生参加了的课程
+    // 获取某学生参加了的课程
     @Test
     public void getAttendedCoursesTest(){
-        ResponseGetCourses responseGetCourses = courseService.getAttendedCourses("testSessionKeymTaGAxt1Sl");
-        //ResponseGetCourses responseGetCourses = courseService.getAttendedCourses(null);
-        for (ResponseCourse responseCourse : responseGetCourses.getCoursesList()) {
-            System.out.println(responseCourse);
+        // 我没有getAttendedCourses这个Dao，不知道该怎么测试Dao
+    }
+
+    // 获取某门课参加的学生
+    @Test
+    public void getAttendStudentsTest(){
+        CourseStudent courseStudent = mockCourseStudent();
+        int studentId = courseStudent.getStudentId();
+        int courseId = courseStudent.getCourseId();
+        courseStudentDAO.attendCourse(courseStudent);
+        List<Student> attendStudents = courseStudentDAO.getAttendStudents(courseId);
+        for (Student attendStudent : attendStudents) {
+            assertEquals(studentId,attendStudent.getId());
         }
     }
 
     //对某门课进行评价
     @Test
     public void remarkCourseTest(){
-
-
-       //这里测试我是用的自己数据库的数据
-        RequestRemarkCourse remark = new RequestRemarkCourse(1118,"testSessionKeymTaGAxt1Sl","课程评价",99.4);
-
-        BaseResponse baseResponse = courseService.remarkCourse(remark);
-        assertEquals(baseResponse.isSuccess(),true);
-        assertEquals("",baseResponse.getErrMsg());
+        CourseStudentRemark courseStudentRemark = mockCourseStudentRemark();
+        boolean status = courseStudentDAO.remarkCourse(courseStudentRemark);
+        assertEquals(true,status);
     }
 }

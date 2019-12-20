@@ -3,6 +3,7 @@ package com.etd.etdservice.dao;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.CourseStudent;
 import com.etd.etdservice.bean.course.Course;
+import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.serivce.CourseService;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
@@ -62,4 +63,11 @@ public interface CourseDAO {
 	 * @return success or not
 	 */
 	boolean create(Course course);
+
+	/**
+	 * queryTeacherByCourseId
+	 * @param courseId
+	 * @return Teacher
+	 */
+	Teacher queryTeacherByCourseId(Integer courseId);
 }

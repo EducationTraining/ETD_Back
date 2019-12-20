@@ -5,6 +5,7 @@ import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.users.response.ResponseGetStudent;
+import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import com.etd.etdservice.serivce.CourseService;
 import com.etd.etdservice.serivce.UserService;
@@ -69,7 +70,7 @@ public class CourseController {
 	}
 
 	@RequestMapping(value = "/attend-students", method = RequestMethod.GET)
-	public ResponseGetStudent getAttendStudents(@RequestParam("courseId") int courseId, @RequestParam("sessionKey")String sessionKey) {
+	public ResponseGetStudents getAttendStudents(@RequestParam("courseId") int courseId, @RequestParam("sessionKey")String sessionKey) {
 		return service.getAttendStudents(courseId, sessionKey);
 	}
 
