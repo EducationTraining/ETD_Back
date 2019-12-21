@@ -10,9 +10,9 @@ import java.util.List;
 public class ResponseGetStudents extends BaseResponse {
     private List<ResponseGetStudent> studentsList;
 
-    public ResponseGetStudents(boolean success, String errMsg,List<ResponseGetStudent> studentsList){
+    public ResponseGetStudents(boolean success, String errMsg, List<ResponseGetStudent> studentsList){
            super(success,errMsg);
-           this.studentsList=studentsList;
+           this.studentsList = studentsList;
     }
 
 }
