@@ -1,5 +1,6 @@
 package com.etd.etdservice.dao;
 
+import com.etd.etdservice.bean.CourseStudent;
 import com.etd.etdservice.bean.CourseStudentRemark;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;

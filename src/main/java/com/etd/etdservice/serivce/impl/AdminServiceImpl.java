@@ -5,14 +5,12 @@ import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.users.Admin;
+import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetAdmin;
 import com.etd.etdservice.bean.users.response.ResponseGetTeacher;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
-import com.etd.etdservice.dao.AdminDAO;
-import com.etd.etdservice.dao.CourseDAO;
-import com.etd.etdservice.dao.CourseStudentDAO;
-import com.etd.etdservice.dao.TeacherDAO;
+import com.etd.etdservice.dao.*;
 import com.etd.etdservice.serivce.AdminService;
 import com.etd.etdservice.utils.MD5Util;
 import com.github.pagehelper.Page;
@@ -49,17 +47,17 @@ public class AdminServiceImpl implements AdminService {
         }
         // 如果该sessionKey不存在，返回失败：没有管理员权限
         Admin resAdmin = adminDAO.queryBySessionKey(sessionKey);
-        if (resAdmin == null) {
+        if(resAdmin == null){
             return new ResponseGetCourses(false, "Admin not found !", null);
         }
         // 获取所有课程
         Page<Course> courses = courseDAO.queryAllCourses();
-        List<ResponseCourse> coursesList = new ArrayList<>();
-        for (Course course : courses) {
+        List<ResponseCourse> coursesList = new ArrayList<ResponseCourse>();
+        for(Course course : courses) {
             // 获取每门课程的教师信息
             Teacher teacher = teacherDAO.queryById(course.getTeacherId());
             // 若教师信息不存在，则此门课程无效，丢弃该课程
-            if (teacher == null) {
+            if(teacher == null) {
                 continue;
             }
             ResponseGetTeacher responseGetTeacher = ResponseGetTeacher.fromBeanToResponse(teacher);
@@ -68,7 +66,7 @@ public class AdminServiceImpl implements AdminService {
             ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(course, responseGetTeacher, num_stu);
             coursesList.add(responseCourse);
         }
-        if (coursesList.size() == 0) {
+        if(coursesList.size() == 0) {
             return new ResponseGetCourses(false, "当前没有课程",coursesList);
         }
         return new ResponseGetCourses(true, "", coursesList);
@@ -79,19 +77,21 @@ public class AdminServiceImpl implements AdminService {
         BaseResponse baseResponse = new BaseResponse();
         // 如果session为null，返回失败
         if (sessionKey == null) {
-            baseResponse.setFailResponse(BaseResponse.NULL_SESSION_KEY);
+            baseResponse.setSuccess(false);
+            baseResponse.setErrMsg("sessionKey error !");
             return baseResponse;
         }
         // 如果该sesionKey不存在，返回失败：没有管理员权限
         Admin resAdmin = adminDAO.queryBySessionKey(sessionKey);
-        if (resAdmin == null) {
-            baseResponse.setFailResponse(BaseResponse.NULL_ADMIN);
+        if(resAdmin == null){
+            baseResponse.setSuccess(false);
+            baseResponse.setErrMsg("Admin not found !");
             return baseResponse;
         }
         // 获取该课程，并修改状态
         Course course = courseDAO.queryById(courseId);
         course.setStatus(status);
-        if (courseDAO.update(course)) {
+        if(courseDAO.update(course)) {
             //修改成功，返回成功
             baseResponse.setSuccess(true);
             return baseResponse;
@@ -104,19 +104,22 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public ResponseGetAdmin getAdminInfo(String sessionKey) {
-        ResponseGetAdmin responseGetAdmin=new ResponseGetAdmin();
         // 若sessionKey为null或者sessionKey不存在，则返回null
-        if (sessionKey == null) {
-            responseGetAdmin.setFailResponse(BaseResponse.NULL_SESSION_KEY);
+        if(sessionKey == null) {
+            ResponseGetAdmin responseGetAdmin=new ResponseGetAdmin();
+            responseGetAdmin.setSuccess(false);
+            responseGetAdmin.setErrMsg("sessionKey error !");
             return responseGetAdmin;
         }
         Admin admin = adminDAO.queryBySessionKey(sessionKey);
-        if (admin == null) {
-            responseGetAdmin.setFailResponse(BaseResponse.NULL_ADMIN);
+        if(admin == null) {
+            ResponseGetAdmin responseGetAdmin=new ResponseGetAdmin();
+            responseGetAdmin.setSuccess(false);
+            responseGetAdmin.setErrMsg("admin not found !");
             return responseGetAdmin;
         }
         // 封装管理员信息并返回
-        responseGetAdmin.setSuccess(true);
+        ResponseGetAdmin responseGetAdmin = new ResponseGetAdmin();
         responseGetAdmin.setUserName(admin.getUserName());
         responseGetAdmin.setEmail(admin.getEmail());
         responseGetAdmin.setPhone(admin.getPhone());
@@ -157,17 +160,19 @@ public class AdminServiceImpl implements AdminService {
         // 若该用户名不存在，返回失败
         Admin resAdmin = adminDAO.queryByUserName(userName);
         if (resAdmin == null) {
-            return new ResponseRegister(false, "invalid user name, may need register", null);
+            return new ResponseRegister(false,
+                    "invalid user name, may need register", null);
         }
         // 获取管理员信息
         String resSessionKey = resAdmin.getSessionKey();
         // 验证用户名和密码是否正确，正确则返回正确
         if (resSessionKey.equals(MD5Util.getMD5String(userName + password))) {
-            return new ResponseRegister(true, "",  resSessionKey);
+                return new ResponseRegister(true, "",  resSessionKey);
         }
         // 用户名和密码不正确
         else {
-            return new ResponseRegister(false, "invalid password", null);
+                return new ResponseRegister(false,
+                        "invalid password", null);
         }
     }
 }

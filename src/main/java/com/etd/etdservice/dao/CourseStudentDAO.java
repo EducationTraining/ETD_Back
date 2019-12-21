@@ -3,8 +3,12 @@ package com.etd.etdservice.dao;
 import com.etd.etdservice.bean.CourseStudent;
 import com.etd.etdservice.bean.CourseStudentRemark;
 import com.etd.etdservice.bean.course.Course;
+import com.etd.etdservice.bean.course.response.ResponseCourse;
+import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.users.Student;
+import lombok.experimental.var;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

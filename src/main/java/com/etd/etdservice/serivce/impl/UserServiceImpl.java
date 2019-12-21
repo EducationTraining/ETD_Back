@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		Teacher resTeacher = teacherDAO.queryByUserName(userName);
-		if (resTeacher == null) {
+		if (resTeacher== null) {
 			return new ResponseRegister(false,
 					"invalid user name, may need register", null);
 		} else {
@@ -130,76 +130,22 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public BaseResponse updateStudentInfo(RequestUpdateStudent request) {
-		BaseResponse response = new BaseResponse();
-		if (request.getSessionKey() == null) {
-			response.setFailResponse(BaseResponse.NULL_SESSION_KEY);
-			return response;
-		}
-		Student student = studentDAO.queryBySessionKey(request.getSessionKey());
-		if (student == null) {
-			response.setFailResponse(BaseResponse.NULL_STUDENT);
-			return response;
-		}
-
-		student.setUserName(request.getUserName());
-		student.setRealName(request.getRealName());
-		student.setPhone(request.getPhone());
-		student.setEmail(request.getEmail());
-		student.setSex(request.getSex());
-
-		if (studentDAO.update(student)) {
-			return new BaseResponse(true, "");
-		}
-		log.warn("can not update studentInfo, studentId (" + student.getId() + ")");
-		return new BaseResponse(false, "update student information error");
+		return null;
 	}
 
 	@Override
 	public ResponseGetStudent getStudentInfo(String sessionKey) {
-		ResponseGetStudent response = new ResponseGetStudent();
-		if (sessionKey == null) {
-			response.setFailResponse(BaseResponse.NULL_SESSION_KEY);
-			return  response;
-		}
-		Student student = studentDAO.queryBySessionKey(sessionKey);
-		return ResponseGetStudent.fromBeanToResponse(student);
+		return null;
 	}
 
 	@Override
 	public BaseResponse updateTeacherInfo(RequestUpdateTeacher request) {
-		BaseResponse response = new BaseResponse();
-		if (request.getSessionKey() == null) {
-			response.setFailResponse(BaseResponse.NULL_SESSION_KEY);
-			return response;
-		}
-		Teacher teacher = teacherDAO.queryBySessionKey(request.getSessionKey());
-		if (teacher == null) {
-			response.setFailResponse(BaseResponse.NULL_TEACHER);
-			return response;
-		}
-
-		teacher.setUserName(request.getUserName());
-		teacher.setRealName(request.getRealName());
-		teacher.setPhone(request.getPhone());
-		teacher.setEmail(request.getEmail());
-		teacher.setDescription(request.getDescription());
-
-		if(teacherDAO.update(teacher)) {
-			return new BaseResponse(true, "");
-		}
-		log.warn("can not update studentInfo, studentId (" + teacher.getId() + ")");
-		return new BaseResponse(false, "update student information error");
+		return null;
 	}
 
 	@Override
 	public ResponseGetTeacher getTeacherInfo(String sessionKey) {
-		if (sessionKey == null) {
-			ResponseGetTeacher response = new ResponseGetTeacher();
-			response.setFailResponse(BaseResponse.NULL_SESSION_KEY);
-			return response;
-		}
-		Teacher teacher = teacherDAO.queryBySessionKey(sessionKey);
-		return ResponseGetTeacher.fromBeanToResponse(teacher);
+		return null;
 	}
 
 	@Override

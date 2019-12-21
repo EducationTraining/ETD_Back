@@ -1,12 +1,15 @@
 package com.etd.etdservice.dao;
 
 
+
 import com.etd.etdservice.bean.CourseStudent;
 import com.etd.etdservice.bean.CourseStudentRemark;
 import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.users.Student;
+
 import com.etd.etdservice.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +55,7 @@ public class CourseStudentDAOTest {
 
     // 学生选课测试
     @Test
-    public void attendCourseTest() {
+    public void attendCourseTest(){
         CourseStudent courseStudent = mockCourseStudent();
         boolean status = courseStudentDAO.attendCourse(courseStudent);
         assertEquals(true,status);
@@ -60,7 +63,7 @@ public class CourseStudentDAOTest {
 
     // 学生退课测试
     @Test
-    public void withdrawCourseTest() {
+    public void withdrawCourseTest(){
         CourseStudent courseStudent = mockCourseStudent();
         int studentId = courseStudent.getStudentId();
         int courseId = courseStudent.getCourseId();
@@ -71,7 +74,7 @@ public class CourseStudentDAOTest {
 
     // 获取某学生是否参加了某门课程
     @Test
-    public void isAttendCourseTest() {
+    public void isAttendCourseTest(){
         CourseStudent courseStudent = mockCourseStudent();
         int studentId = courseStudent.getStudentId();
         int courseId = courseStudent.getCourseId();
@@ -83,7 +86,7 @@ public class CourseStudentDAOTest {
 
     // 获取某学生参加了的课程
     @Test
-    public void getAttendedCoursesTest() {
+    public void getAttendedCoursesTest(){
         Course course = new Course();
         String courseNum = StringUtil.generateRandomString("testCourseNum");
         course.setTeacherId(new Random().nextInt(9999));
@@ -105,23 +108,23 @@ public class CourseStudentDAOTest {
 
     // 获取某门课参加的学生
     @Test
-    public void getAttendStudentsTest() {
+    public void getAttendStudentsTest(){
         CourseStudent courseStudent = mockCourseStudent();
         int studentId = courseStudent.getStudentId();
         int courseId = courseStudent.getCourseId();
         courseStudentDAO.attendCourse(courseStudent);
         List<Student> attendStudents = courseStudentDAO.getAttendStudents(courseId);
         for (Student attendStudent : attendStudents) {
-            assertEquals(studentId, attendStudent.getId());
+            assertEquals(studentId,attendStudent.getId());
         }
     }
 
-    // 对某门课进行评价
+    //对某门课进行评价
     @Test
-    public void remarkCourseTest() {
+    public void remarkCourseTest(){
         CourseStudentRemark courseStudentRemark = mockCourseStudentRemark();
         boolean status = courseStudentDAO.remarkCourse(courseStudentRemark);
-        assertEquals(true, status);
+        assertEquals(true,status);
     }
 
     @Test
@@ -130,7 +133,7 @@ public class CourseStudentDAOTest {
         courseStudentDAO.create(courseStudent);
         CourseStudent resCourseStudent=courseStudentDAO.getByCourseStudent(courseStudent);
         assertEquals(courseStudent.getCourseId(), resCourseStudent.getCourseId());
-        assertEquals(courseStudent.getStudentId(), resCourseStudent.getStudentId());
+        assertEquals(courseStudent.getStudentId(),resCourseStudent.getStudentId());
     }
 
 
