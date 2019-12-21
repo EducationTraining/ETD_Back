@@ -4,8 +4,10 @@ package com.etd.etdservice.dao;
 
 import com.etd.etdservice.bean.CourseStudent;
 import com.etd.etdservice.bean.CourseStudentRemark;
+import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.users.Student;
 
+import com.etd.etdservice.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.Test;
@@ -27,6 +29,8 @@ public class CourseStudentDAOTest {
 
     @Autowired
     private CourseStudentDAO courseStudentDAO;
+    @Autowired
+    private CourseDAO courseDAO;
 
 
     public static CourseStudent mockCourseStudent() {
@@ -83,7 +87,23 @@ public class CourseStudentDAOTest {
     // 获取某学生参加了的课程
     @Test
     public void getAttendedCoursesTest(){
-        // 我没有getAttendedCourses这个Dao，不知道该怎么测试Dao
+        Course course = new Course();
+        String courseNum = StringUtil.generateRandomString("testCourseNum");
+        course.setTeacherId(new Random().nextInt(9999));
+        course.setCourseNum(courseNum);
+        course.setCreateTime(new Date());
+        courseDAO.create(course);
+        int courseId = courseDAO.queryByCourseNum(courseNum).getId();
+
+        CourseStudent courseStudent = new CourseStudent();
+        int studentId = new Random().nextInt(9999);
+        courseStudent.setCourseId(courseId);
+        courseStudent.setStudentId(studentId);
+        courseStudent.setCreateTime(new Date());
+        courseStudentDAO.attendCourse(courseStudent);
+
+        List<Course> attendedCourses = courseStudentDAO.getAttendedCourses(studentId);
+        assertEquals(courseId,attendedCourses.get(0).getId());
     }
 
     // 获取某门课参加的学生
