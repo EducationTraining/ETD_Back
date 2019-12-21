@@ -1,10 +1,7 @@
 package com.etd.etdservice.dao;
 
-import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.Course;
-import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
-import com.etd.etdservice.serivce.CourseService;
 import com.etd.etdservice.utils.DoubleUtil;
 import com.etd.etdservice.utils.StringUtil;
 import com.github.pagehelper.Page;
@@ -18,7 +15,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

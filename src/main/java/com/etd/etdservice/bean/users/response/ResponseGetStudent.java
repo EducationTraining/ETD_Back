@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
 
-
 import java.util.List;
 
 @Data
@@ -24,12 +23,36 @@ public class ResponseGetStudent extends BaseResponse {
 	private String sex;
 	private List<ResponseCourse> latestTwoCourses;
 
-	public static ResponseGetStudent fromBeanToResponse(boolean success, String errMsg, List<ResponseCourse> latestTwoCourses,Student bean) {
+	/**
+	 * 返回不包含最近两门课的学生信息
+	 * @param bean
+	 * @return
+	 */
+	public static ResponseGetStudent fromBeanToResponse(Student bean) {
+		return fromBeanToResponse(bean, null);
+	}
+
+	/**
+	 * 返回包含最近两门课的学生信息
+	 * @param bean
+	 * @param latestTwoCourses
+	 * @return
+	 */
+	public static ResponseGetStudent fromBeanToResponse(Student bean, List<ResponseCourse> latestTwoCourses) {
 		ResponseGetStudent response = new ResponseGetStudent();
+		if (bean == null) {
+			response.setFailResponse(BaseResponse.NULL_STUDENT);
+			return response;
+		}
 		response.setLatestTwoCourses(latestTwoCourses);
-		response.setSuccess(success);
-		response.setErrMsg(errMsg);
-		BeanUtils.copyProperties(bean, response);
+		try {
+			BeanUtils.copyProperties(bean, response);
+			response.setSuccess(true);
+			response.setErrMsg("");
+		} catch (Exception e) {
+			response.setFailResponse(COPY_EXCEPTION);
+			return response;
+		}
 		return response;
 	}
 }

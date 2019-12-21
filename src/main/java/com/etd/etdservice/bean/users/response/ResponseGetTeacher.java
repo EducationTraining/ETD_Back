@@ -1,6 +1,6 @@
 package com.etd.etdservice.bean.users.response;
 
-import com.etd.etdservice.bean.users.Student;
+import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.users.Teacher;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +13,7 @@ import org.springframework.beans.BeansException;
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
-public class ResponseGetTeacher {
+public class ResponseGetTeacher extends BaseResponse {
 	int id;
 	private String userName;
 	private String realName;
@@ -24,13 +24,20 @@ public class ResponseGetTeacher {
 
 	public static ResponseGetTeacher fromBeanToResponse(Teacher bean) {
 		ResponseGetTeacher response = new ResponseGetTeacher();
-		try{
+		if (bean == null) {
+			response.setFailResponse(BaseResponse.NULL_TEACHER);
+			return response;
+		}
+		try {
 			BeanUtils.copyProperties(bean, response);
-		}catch (BeansException e){
+			response.setSuccess(true);
+			response.setDescription("");
+		} catch (BeansException e) {
 			log.error("无法拷贝bean(Teacher)参数! " + "Teacher info:" + bean + " Error info: " + e.getMessage());
-		}catch (IllegalArgumentException e){
+		} catch (IllegalArgumentException e) {
 			log.error("非法参数！无法拷贝teacher的变量. " + "Teacher info:" + bean + " Error info: " + e.getMessage());
-			throw new IllegalArgumentException();
+			response.setFailResponse(COPY_EXCEPTION);
+			return response;
 		}
 		return response;
 	}

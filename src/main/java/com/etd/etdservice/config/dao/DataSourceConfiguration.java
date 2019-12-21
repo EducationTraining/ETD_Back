@@ -28,7 +28,7 @@ public class DataSourceConfiguration {
         dataSource.setJdbcUrl(jdbcUrl);
         dataSource.setUser(jdbcUserName);
         dataSource.setPassword(jdbcPwd);
-        //关闭连接后不自动commit
+        // 关闭连接后不自动commit
         dataSource.setAutoCommitOnClose(false);
         return dataSource;
     }

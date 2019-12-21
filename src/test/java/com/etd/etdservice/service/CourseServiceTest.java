@@ -4,20 +4,19 @@ package com.etd.etdservice.service;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
+import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
 import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetStudents;
+import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import com.etd.etdservice.dao.CourseDAO;
 import com.etd.etdservice.dao.StudentDAO;
 import com.etd.etdservice.dao.TeacherDAO;
 import com.etd.etdservice.dao.UserDAOTest;
 import com.etd.etdservice.serivce.CourseService;
-import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
-import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
-import com.etd.etdservice.dao.CourseDAOTest;
 import com.etd.etdservice.serivce.impl.CourseServiceImpl;
 import com.etd.etdservice.utils.DoubleUtil;
 import com.etd.etdservice.utils.StringUtil;
@@ -26,16 +25,16 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.File;
 
 
 @RunWith(SpringRunner.class)
@@ -71,9 +70,9 @@ public class CourseServiceTest {
     private static final int MAX_PAGE = 10;
 
 
-    public static Course mockCourse(){
+    public static Course mockCourse() {
         Course course = new Course();
-        Teacher teacher  = UserDAOTest.mockTeacher();
+        Teacher teacher = UserDAOTest.mockTeacher();
         teacherDAO.create(teacher);
         Teacher teacherRes = teacherDAO.queryByUserName(teacher.getUserName());
         course.setTeacherId(teacherRes.getId());
@@ -91,7 +90,7 @@ public class CourseServiceTest {
 
     // 学生选课测试
     @Test
-    public void attendCourseTest(){
+    public void attendCourseTest() {
         // mock一个学生并插入students表中
         Student student = UserDAOTest.mockStudent();
         studentDAO.create(student);
@@ -105,13 +104,13 @@ public class CourseServiceTest {
         int courseId = courseDAO.queryByCourseNum(course.getCourseNum()).getId();
 
         BaseResponse baseResponse = courseService.attendCourse(courseId, sessionKey);
-        assertEquals(baseResponse.isSuccess(),true);
-        assertEquals("",baseResponse.getErrMsg());
+        assertTrue(baseResponse.isSuccess());
+        assertEquals("", baseResponse.getErrMsg());
     }
 
     // 学生退课测试
     @Test
-    public void withdrawCourseTest(){
+    public void withdrawCourseTest() {
         // mock一个学生并插入students表中
         Student student = UserDAOTest.mockStudent();
         studentDAO.create(student);
@@ -126,13 +125,13 @@ public class CourseServiceTest {
         courseService.attendCourse(courseId, sessionKey);
         // 再删除选课表(退课)
         BaseResponse baseResponse = courseService.withdrawCourse(courseId,sessionKey);
-        assertEquals(baseResponse.isSuccess(),true);
-        assertEquals("",baseResponse.getErrMsg());
+        assertTrue(baseResponse.isSuccess());
+        assertEquals("", baseResponse.getErrMsg());
     }
 
     // 获取某学生是否参加了某门课程测试
     @Test
-    public void isAttendCourseTest(){
+    public void isAttendCourseTest() {
         // mock一个学生并插入students表中
         Student student = UserDAOTest.mockStudent();
         studentDAO.create(student);
@@ -146,14 +145,13 @@ public class CourseServiceTest {
         courseService.attendCourse(courseId, sessionKey);
         // 再查询
         ResponseIsAttendCourse attendCourse = courseService.isAttendCourse(courseId,sessionKey);
-        assertEquals(attendCourse.isSuccess(),true);
-        assertEquals(attendCourse.isSuccess(),true);
+        assertTrue(attendCourse.isSuccess());
         assertEquals(attendCourse.getErrMsg(),"");
     }
 
     // 获取某学生参加了的课程
     @Test
-    public void getAttendedCoursesTest(){
+    public void getAttendedCoursesTest() {
         // mock一个学生并插入students表中
         Student student = UserDAOTest.mockStudent();
         studentDAO.create(student);
@@ -168,8 +166,8 @@ public class CourseServiceTest {
         int course2Id = courseDAO.queryByCourseNum(course2.getCourseNum()).getId();
 
         //该学生选取这两门课
-        courseService.attendCourse(course1Id,sessionKey);
-        courseService.attendCourse(course2Id,sessionKey);
+        courseService.attendCourse(course1Id, sessionKey);
+        courseService.attendCourse(course2Id, sessionKey);
 
         ResponseGetCourses responseGetCourses = courseService.getAttendedCourses(sessionKey);
         List<ResponseCourse> coursesList = responseGetCourses.getCoursesList();
@@ -182,7 +180,7 @@ public class CourseServiceTest {
 
     // 获取某门课参加的学生
     @Test
-    public void getAttendStudentsTest(){
+    public void getAttendStudentsTest() {
         // mock两个学生并插入students表中
         Student student1 = UserDAOTest.mockStudent();
         studentDAO.create(student1);
@@ -208,7 +206,6 @@ public class CourseServiceTest {
         assertEquals(studentDAO.queryBySessionKey(student2.getSessionKey()).getId(),attendStudents.getStudentsList().get(1).getId());
 
         log.info(attendStudents.getStudentsList().toString());
-
     }
 
     //对某门课进行评价
@@ -228,13 +225,13 @@ public class CourseServiceTest {
 
         RequestRemarkCourse remark = new RequestRemarkCourse(courseId, sessionKey, "课程评价", 99.4);
         BaseResponse baseResponse = courseService.remarkCourse(remark);
-        assertEquals(baseResponse.isSuccess(), true);
+        assertTrue(baseResponse.isSuccess());
         assertEquals("", baseResponse.getErrMsg());
     }
 
     @Test
     public void testGetHottestCourses() {
-        for(int i = 0; i < COURSE_NUM; ++i) {
+        for (int i = 0; i < COURSE_NUM; ++i) {
             Course mockCourse = CourseServiceTest.mockCourse();
             courseDAO.create(mockCourse);
         }
@@ -253,8 +250,8 @@ public class CourseServiceTest {
 
         boolean flag = false;
         List<ResponseCourse> courseList = responseGetCourses.getCoursesList();
-        for(ResponseCourse course : courseList) {
-            if(course.getId() == mockCourse.getId()){
+        for (ResponseCourse course : courseList) {
+            if (course.getId() == mockCourse.getId()){
                 flag = true;
             }
         }
@@ -262,7 +259,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void testGetLatestCourses(){
+    public void testGetLatestCourses() {
         Course mockCourse = CourseServiceTest.mockCourse();
         courseDAO.create(mockCourse);
         ResponseGetCourses responseGetCourses = courseService.getLatestCourses();
@@ -271,8 +268,8 @@ public class CourseServiceTest {
 
         boolean flag = false;
         List<ResponseCourse> courseList = responseGetCourses.getCoursesList();
-        for(int i = 0; i < courseList.size(); ++i){
-            if(courseList.get(i).getId() == mockCourse.getId()){
+        for (int i = 0; i < courseList.size(); ++i){
+            if (courseList.get(i).getId() == mockCourse.getId()){
                 ResponseCourse responseCourse = courseList.get(i);
                 Assert.assertEquals(responseCourse.getTeacher().getId(), (int)mockCourse.getTeacherId());
             }
@@ -280,12 +277,12 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void testGetCourses(){
-        for(int i = 0; i < LIMIT * MAX_PAGE; ++i){
+    public void testGetCourses() {
+        for (int i = 0; i < LIMIT * MAX_PAGE; ++i){
             Course course = mockCourse();
             courseDAO.create(course);
         }
-        for(int page = 1; page < MAX_PAGE; ++page){
+        for (int page = 1; page < MAX_PAGE; ++page){
             ResponseGetCourses responseGetCourses = courseService.getCourses(page, LIMIT);
 
             Assert.assertTrue(responseGetCourses.isSuccess());
@@ -295,7 +292,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void testUploadCoursePic(){
+    public void testUploadCoursePic() {
         Course course = mockCourse();
         courseDAO.create(course);
         course = courseDAO.queryByCourseNum(course.getCourseNum());
@@ -323,11 +320,11 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void testUpdateCourseInfo(){
+    public void testUpdateCourseInfo() {
         Course mockCourse = mockCourse();
-        //course与mockCourse都是随机生成的。
+        // course与mockCourse都是随机生成的。
         // 将course插入数据库，然后用mockCourse的信息作为course的更新信息
-        //更新后比对course更新后的信息与mockCourse是否一致
+        // 更新后比对course更新后的信息与mockCourse是否一致
         Course course = mockCourse();
         mockCourse.setStatus(1);
         courseDAO.create(course);
@@ -337,21 +334,21 @@ public class CourseServiceTest {
 
         RequestUpdateCourse request = new RequestUpdateCourse();
 
-        //无传入信息，应当返回false
+        // 无传入信息，应当返回false
         BaseResponse response = courseService.updateCourseInfo(request);
         Assert.assertFalse(response.isSuccess());
 
-        //只有老师的sessionKey，无courseId，返回false
+        // 只有老师的sessionKey，无courseId，返回false
         request.setSessionKey(teacher.getSessionKey());
         response = courseService.updateCourseInfo(request);
         Assert.assertFalse(response.isSuccess());
 
-        //老师的sessionKey和课程的courseId都有
+        // 老师的sessionKey和课程的courseId都有
         request.setCourseId(course.getId());
         response = courseService.updateCourseInfo(request);
         Assert.assertTrue(response.isSuccess());
 
-        //只更新一项
+        // 只更新一项
         request.setName(mockCourse.getName());
         response = courseService.updateCourseInfo(request);
         Assert.assertTrue(response.isSuccess());
@@ -371,7 +368,7 @@ public class CourseServiceTest {
         course = courseDAO.queryById(course.getId());
         Assert.assertEquals(mockCourse.getName(), course.getName());
         Assert.assertEquals(mockCourse.getPages(), course.getPages());
-        //startTime比较存在一定的出入
+        // startTime比较存在一定的出入
         Assert.assertEquals(mockCourse.getStartTime().toString(), course.getStartTime().toString());
         Assert.assertEquals(mockCourse.getWeeks(), course.getWeeks());
         Assert.assertEquals(mockCourse.getStatus(), course.getStatus());
@@ -379,14 +376,14 @@ public class CourseServiceTest {
         Assert.assertEquals(mockCourse.getNote(), course.getNote());
         Assert.assertEquals(mockCourse.getAvatarUrl(), course.getAvatarUrl());
 
-        //测试course部分更新
+        // 测试course部分更新
         request.setStartTime(null);
         request.setWeeks(null);
         request.setDescription(null);
         response = courseService.updateCourseInfo(request);
         Assert.assertTrue(response.isSuccess());
 
-        //设置错误courseId，应当无法更新，返回false
+        // 设置错误courseId，应当无法更新，返回false
         request.setCourseId(49521354);
         response = courseService.updateCourseInfo(request);
         Assert.assertFalse(response.isSuccess());

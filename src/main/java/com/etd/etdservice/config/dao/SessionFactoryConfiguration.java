@@ -14,15 +14,15 @@ import java.io.IOException;
 
 @Configuration
 public class SessionFactoryConfiguration {
-    //mybatis-config.xml配置文件的路径
+    // mybatis-config.xml配置文件的路径
     @Value("${mybatis_config_file}")
     private String mybatisConfigPath;
 
-    //mybatis mapper所在文件的路径
+    // mybatis mapper所在文件的路径
     @Value("${mapper_path}")
     private String mapperPath;
 
-    //实体类所在的package
+    // 实体类所在的package
     @Value("${entity_package}")
     private String entityPackage;
 
@@ -33,7 +33,7 @@ public class SessionFactoryConfiguration {
     @Bean(name="sqlSessionFactory")
     public SqlSessionFactoryBean createSqlSessionFactoryBean() throws IOException {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        //设置扫描路径
+        // 设置扫描路径
         sqlSessionFactoryBean.setConfigLocation(new ClassPathResource(mybatisConfigPath));
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         String packageSearchPath = PathMatchingResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + mapperPath;
