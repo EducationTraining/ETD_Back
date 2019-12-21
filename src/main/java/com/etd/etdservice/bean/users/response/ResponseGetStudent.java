@@ -5,6 +5,7 @@ import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.dao.CourseDAO;
+import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,20 +29,19 @@ public class ResponseGetStudent extends BaseResponse {
 
 	public static ResponseGetStudent fromBeanToResponse(Student bean) {
 		ResponseGetStudent response = new ResponseGetStudent();
-		//response.setLastestTwoCourses();
-		BeanUtils.copyProperties(bean, response);
+		if(bean == null) {
+			response.setFailResponse(BaseResponse.NULL_STUDENT);
+			return response;
+		}
+		response.setLatestTwoCourses(null);
+		try {
+			BeanUtils.copyProperties(bean, response);
+			response.setSuccess(true);
+			response.setErrMsg("");
+		}catch (Exception e){
+			response.setFailResponse(COPY_EXCEPTION);
+			return response;
+		}
 		return response;
 	}
-
-	public ResponseGetStudent(boolean success,String errMsg,Student bean){
-		super(success, errMsg);
-		ResponseGetStudent response = new ResponseGetStudent();
-		//response.setLastestTwoCourses(...);
-		BeanUtils.copyProperties(bean, response);
-	}
-
-	/*public static List<Course> setLastestTwoCourses(){
-
-		CourseDAO.queryHottestCourses(2);
-	}*/
 }

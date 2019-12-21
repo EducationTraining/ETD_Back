@@ -6,6 +6,8 @@ import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.requests.RequestRegister;
 import com.etd.etdservice.bean.users.requests.RequestUpdateStudent;
 import com.etd.etdservice.bean.users.requests.RequestUpdateTeacher;
+import com.etd.etdservice.bean.users.response.ResponseGetStudent;
+import com.etd.etdservice.bean.users.response.ResponseGetTeacher;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
 import com.etd.etdservice.dao.StudentDAO;
 import com.etd.etdservice.dao.TeacherDAO;
@@ -145,6 +147,22 @@ public class UserServiceTest {
 	}
 
 	@Test
+	public void testGetStudentInfo() {
+		Student student = UserDAOTest.mockStudent();
+		if(!studentDAO.create(student)){
+			log.error("无法插入学生，测试无法进行");
+			fail();
+		}
+		ResponseGetStudent response = userService.getStudentInfo(student.getSessionKey());
+		Assert.assertNotNull(response);
+		Assert.assertTrue(response.isSuccess());
+		Assert.assertEquals(response.getUserName(), student.getUserName());
+
+		response = userService.getStudentInfo(StringUtil.generateRandomString("invalid"));
+		Assert.assertFalse(response.isSuccess());
+	}
+
+	@Test
 	public void testUpdateTeacherInfo() {
 		Teacher teacher = UserDAOTest.mockTeacher();
 		if(!teacherDAO.create(teacher)){
@@ -168,6 +186,22 @@ public class UserServiceTest {
 
 		request.setSessionKey(RandomStringUtils.randomAlphanumeric(10));
 		response = userService.updateTeacherInfo(request);
+		Assert.assertFalse(response.isSuccess());
+	}
+
+	@Test
+	public void testGetTeacherInfo() {
+		Teacher teacher = UserDAOTest.mockTeacher();
+		if(!teacherDAO.create(teacher)){
+			log.error("无法插入老师，测试无法进行");
+			fail();
+		}
+		ResponseGetTeacher response = userService.getTeacherInfo(teacher.getSessionKey());
+		Assert.assertNotNull(response);
+		Assert.assertTrue(response.isSuccess());
+		Assert.assertEquals(response.getUserName(), teacher.getUserName());
+
+		response = userService.getTeacherInfo(StringUtil.generateRandomString("invalid"));
 		Assert.assertFalse(response.isSuccess());
 	}
 
