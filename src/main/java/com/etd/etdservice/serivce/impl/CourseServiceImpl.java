@@ -11,14 +11,13 @@ import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
-import com.etd.etdservice.bean.users.response.*;
+import com.etd.etdservice.bean.users.response.ResponseGetStudent;
+import com.etd.etdservice.bean.users.response.ResponseGetStudents;
+import com.etd.etdservice.bean.users.response.ResponseGetTeacher;
+import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import com.etd.etdservice.dao.CourseDAO;
 import com.etd.etdservice.dao.CourseStudentDAO;
 import com.etd.etdservice.dao.StudentDAO;
-import com.etd.etdservice.bean.users.response.ResponseGetStudent;
-import com.etd.etdservice.bean.users.response.ResponseGetTeacher;
-import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
-
 import com.etd.etdservice.dao.TeacherDAO;
 import com.etd.etdservice.serivce.CourseService;
 import com.etd.etdservice.utils.FileHelper;
@@ -26,11 +25,10 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

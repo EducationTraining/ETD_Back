@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		Teacher resTeacher = teacherDAO.queryByUserName(userName);
-		if (resTeacher== null) {
+		if (resTeacher == null) {
 			return new ResponseRegister(false,
 					"invalid user name, may need register", null);
 		} else {
@@ -173,7 +173,7 @@ public class UserServiceImpl implements UserService {
 			return response;
 		}
 		Teacher teacher = teacherDAO.queryBySessionKey(request.getSessionKey());
-		if(teacher == null) {
+		if (teacher == null) {
 			response.setFailResponse(BaseResponse.NULL_TEACHER);
 			return response;
 		}
@@ -193,7 +193,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResponseGetTeacher getTeacherInfo(String sessionKey) {
-		if(sessionKey == null) {
+		if (sessionKey == null) {
 			ResponseGetTeacher response = new ResponseGetTeacher();
 			response.setFailResponse(BaseResponse.NULL_SESSION_KEY);
 			return response;

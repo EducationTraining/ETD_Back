@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
+
 import java.util.List;
 
 @Data
@@ -39,7 +40,7 @@ public class ResponseGetStudent extends BaseResponse {
 	 */
 	public static ResponseGetStudent fromBeanToResponse(Student bean, List<ResponseCourse> latestTwoCourses) {
 		ResponseGetStudent response = new ResponseGetStudent();
-		if(bean == null) {
+		if (bean == null) {
 			response.setFailResponse(BaseResponse.NULL_STUDENT);
 			return response;
 		}
@@ -48,7 +49,7 @@ public class ResponseGetStudent extends BaseResponse {
 			BeanUtils.copyProperties(bean, response);
 			response.setSuccess(true);
 			response.setErrMsg("");
-		}catch (Exception e){
+		} catch (Exception e) {
 			response.setFailResponse(COPY_EXCEPTION);
 			return response;
 		}

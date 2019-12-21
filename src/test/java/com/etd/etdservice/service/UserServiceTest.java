@@ -16,11 +16,9 @@ import com.etd.etdservice.serivce.UserService;
 import com.etd.etdservice.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.hamcrest.core.AllOf;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -122,7 +120,7 @@ public class UserServiceTest {
 	@Test
 	public void testUpdateStudentInfo() {
 		Student student = UserDAOTest.mockStudent();
-		if(!studentDAO.create(student)){
+		if (!studentDAO.create(student)) {
 			log.error("无法插入学生，测试无法进行");
 			fail();
 		}
@@ -149,7 +147,7 @@ public class UserServiceTest {
 	@Test
 	public void testGetStudentInfo() {
 		Student student = UserDAOTest.mockStudent();
-		if(!studentDAO.create(student)){
+		if (!studentDAO.create(student)) {
 			log.error("无法插入学生，测试无法进行");
 			fail();
 		}
@@ -165,7 +163,7 @@ public class UserServiceTest {
 	@Test
 	public void testUpdateTeacherInfo() {
 		Teacher teacher = UserDAOTest.mockTeacher();
-		if(!teacherDAO.create(teacher)){
+		if (!teacherDAO.create(teacher)) {
 			log.error("无法插入老师，测试无法进行");
 			fail();
 		}
@@ -192,7 +190,7 @@ public class UserServiceTest {
 	@Test
 	public void testGetTeacherInfo() {
 		Teacher teacher = UserDAOTest.mockTeacher();
-		if(!teacherDAO.create(teacher)){
+		if (!teacherDAO.create(teacher)) {
 			log.error("无法插入老师，测试无法进行");
 			fail();
 		}

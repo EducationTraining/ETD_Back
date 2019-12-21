@@ -1,7 +1,6 @@
 package com.etd.etdservice.bean.users.response;
 
 import com.etd.etdservice.bean.BaseResponse;
-import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +24,7 @@ public class ResponseGetTeacher extends BaseResponse {
 
 	public static ResponseGetTeacher fromBeanToResponse(Teacher bean) {
 		ResponseGetTeacher response = new ResponseGetTeacher();
-		if(bean == null) {
+		if (bean == null) {
 			response.setFailResponse(BaseResponse.NULL_TEACHER);
 			return response;
 		}
@@ -33,9 +32,9 @@ public class ResponseGetTeacher extends BaseResponse {
 			BeanUtils.copyProperties(bean, response);
 			response.setSuccess(true);
 			response.setDescription("");
-		}catch (BeansException e) {
+		} catch (BeansException e) {
 			log.error("无法拷贝bean(Teacher)参数! " + "Teacher info:" + bean + " Error info: " + e.getMessage());
-		}catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			log.error("非法参数！无法拷贝teacher的变量. " + "Teacher info:" + bean + " Error info: " + e.getMessage());
 			response.setFailResponse(COPY_EXCEPTION);
 			return response;

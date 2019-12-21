@@ -1,8 +1,8 @@
 package com.etd.etdservice.bean.users.requests;
 
-import com.etd.etdservice.bean.users.Student;
-import lombok.*;
-import org.springframework.beans.BeanUtils;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor

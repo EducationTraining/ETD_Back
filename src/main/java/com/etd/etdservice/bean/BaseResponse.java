@@ -14,7 +14,8 @@ public class BaseResponse {
 	public static final int NULL_SESSION_KEY = 1;
 	public static final int NULL_TEACHER = 2;
 	public static final int NULL_STUDENT = 3;
-	public static final int COPY_EXCEPTION = 4;
+	public static final int NULL_ADMIN = 4;
+	public static final int COPY_EXCEPTION = 5;
 
 	public void setNullState() {
 		this.success = false;
@@ -35,6 +36,8 @@ public class BaseResponse {
 			case NULL_TEACHER: errorMessage = "null teacher";
 				break;
 			case NULL_STUDENT: errorMessage = "null student";
+				break;
+			case NULL_ADMIN: errorMessage = "null admin";
 				break;
 			case COPY_EXCEPTION: errorMessage = "can not copy object's field to response";
 				break;
