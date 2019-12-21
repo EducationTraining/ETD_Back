@@ -209,10 +209,10 @@ public class CourseServiceImpl implements CourseService {
 		boolean status = courseStudentDAO.attendCourse(courseStudent);
 		if(status == true){
 			//选课成功
-			return new BaseResponse(true,"");
+			return new BaseResponse(true, "");
 		}else{
 			//选课失败
-			return new BaseResponse(false,"attendCourse failed");
+			return new BaseResponse(false, "attendCourse failed");
 		}
 
 	}
@@ -232,13 +232,13 @@ public class CourseServiceImpl implements CourseService {
 		Student student = studentDAO.queryBySessionKey(sessionKey);
 		Integer studentId = student.getId();
 
-		boolean status = courseStudentDAO.withdrawCourse(courseId,studentId);
+		boolean status = courseStudentDAO.withdrawCourse(courseId, studentId);
 		if(status == true){
 			//退课成功
-			return new BaseResponse(true,"");
+			return new BaseResponse(true, "");
 		}else{
 			//退课失败
-			return new BaseResponse(false,"withdrawCourse failed");
+			return new BaseResponse(false, "withdrawCourse failed");
 		}
 
 	}
@@ -252,20 +252,20 @@ public class CourseServiceImpl implements CourseService {
 	@Override
 	public ResponseIsAttendCourse isAttendCourse(Integer courseId, String sessionKey) {
 		if (courseId == null || sessionKey == null) {
-			return new ResponseIsAttendCourse(false, "param error",false);
+			return new ResponseIsAttendCourse(false, "param error", false);
 		}
 
-		//根据学生sessionKey获取学生id
+		// 根据学生sessionKey获取学生id
 		Student student = studentDAO.queryBySessionKey(sessionKey);
 		Integer studentId = student.getId();
 
 		CourseStudent courseStudent = courseStudentDAO.isAttendCourse(courseId, studentId);
-		if(courseStudent !=null){
-			//参加该课
-			return new ResponseIsAttendCourse(true,"",true);
+		if(courseStudent != null){
+			// 参加该课
+			return new ResponseIsAttendCourse(true, "", true);
 		}else{
-			//未参加该课
-			return new ResponseIsAttendCourse(true,"",false);
+			// 未参加该课
+			return new ResponseIsAttendCourse(true, "", false);
 		}
 
 	}
@@ -278,26 +278,24 @@ public class CourseServiceImpl implements CourseService {
 	@Override
 	public ResponseGetCourses getAttendedCourses(String sessionKey) {
 		if (sessionKey == null) {
-			return new ResponseGetCourses(false, "param error",null);
+			return new ResponseGetCourses(false, "param error", null);
 		}
 		// 根据学生sessionKey获取学生id
 		Student student = studentDAO.queryBySessionKey(sessionKey);
 		Integer studentId = student.getId();
 
-		// 根据studentId查已选课程id
-		List<Integer> courseIdList = courseStudentDAO.queryCourseIdByStudentId(studentId);
+		// 根据studentId查已选课程
+		List<Course> courseList = courseStudentDAO.getAttendedCourses(studentId);
 
 		List<ResponseCourse> responseCourses = new ArrayList<>();
 
-		for (Integer courseId : courseIdList) {
-			Course course = courseDAO.queryById(courseId);
-			Teacher teacher = courseDAO.queryTeacherByCourseId(courseId);
-			ResponseCourse rC = new ResponseCourse();
-			ResponseCourse responseCourse = rC.fromBeanToResponse(course, ResponseGetTeacher.fromBeanToResponse(teacher), studentId);
+		for (Course course : courseList) {
+			Teacher teacher = courseDAO.queryTeacherByCourseId(course.getId());
+			ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(course, ResponseGetTeacher.fromBeanToResponse(teacher), studentId);
 			responseCourses.add(responseCourse);
 		}
 
-		ResponseGetCourses attendedCourses = new ResponseGetCourses(true,"",responseCourses);
+		ResponseGetCourses attendedCourses = new ResponseGetCourses(true, "", responseCourses);
 
 		return attendedCourses;
 
@@ -312,7 +310,7 @@ public class CourseServiceImpl implements CourseService {
 	@Override
 	public ResponseGetStudents getAttendStudents(Integer courseId, String sessionKey) {
 		if (courseId == null || sessionKey == null) {
-			return new ResponseGetStudents(false,"param error",null);
+			return new ResponseGetStudents(false, "param error", null);
 		}
 		// 判断该老师是否是该课程的任课老师
 		Teacher teacher = teacherDAO.queryBySessionKey(sessionKey);
@@ -321,15 +319,27 @@ public class CourseServiceImpl implements CourseService {
 		if (teacherId == course.getTeacherId()) {
 			// 如果是，根据courseId查询选课学生
 			List<Student> attendStudents = courseStudentDAO.getAttendStudents(courseId);
-			 List<ResponseGetStudent> studentsList = new ArrayList<>();
+			List<ResponseGetStudent> studentsList = new ArrayList<>();
+
 			for (Student attendStudent : attendStudents) {
-				ResponseGetStudent responseGetStudent = ResponseGetStudent.fromBeanToResponse(attendStudent);
+				// 获取该学生最近两门课
+				List<Course> latestTwoCourses = studentDAO.queryLatestTwoCourses(attendStudent.getId());
+				List<ResponseCourse> latestTwoResponseCourses = new ArrayList<>();
+				for (Course courseC : latestTwoCourses) {
+					Teacher teacherT = teacherDAO.queryById(courseC.getTeacherId());
+					ResponseGetTeacher responseGetTeacher = ResponseGetTeacher.fromBeanToResponse(teacherT);
+					Integer studentNum = courseStudentDAO.getStudentCountsByCourseId(courseC.getId());
+					ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(courseC, responseGetTeacher, studentNum);
+					latestTwoResponseCourses.add(responseCourse);
+				}
+
+				ResponseGetStudent responseGetStudent = ResponseGetStudent.fromBeanToResponse(attendStudent, latestTwoResponseCourses);
 				studentsList.add(responseGetStudent);
 			}
-			return new ResponseGetStudents(true,"",studentsList);
+			return new ResponseGetStudents(true, "", studentsList);
 		} else {
 			// 如果不是，返回课程号错误
-			return new ResponseGetStudents(false,"courseId error",null);
+			return new ResponseGetStudents(false, "courseId error", null);
 		}
 	}
 
@@ -359,7 +369,7 @@ public class CourseServiceImpl implements CourseService {
 
 			if (status == true) {
 				// 评价成功
-				return new BaseResponse(true,"");
+				return new BaseResponse(true, "");
 			} else {
 				// 评价失败
 				return new BaseResponse(false,"remarkCourse failed");

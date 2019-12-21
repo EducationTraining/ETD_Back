@@ -57,10 +57,10 @@
     </select>
 
     <!--根据学生ID查询课程ID-->
-    <select id="queryCourseIdByStudentId" parameterType="int" resultType="int">
-        SELECT course_id
-        FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name"/>
-        WHERE student_id = #{studentId};
+    <select id="getAttendedCourses" parameterType="int" resultType="Course">
+        SELECT c.*
+        FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name"/> cs, courses c
+        WHERE student_id = #{studentId} AND cs.course_id = c.id;
     </select>
 
 

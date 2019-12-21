@@ -207,6 +207,8 @@ public class CourseServiceTest {
         assertEquals(studentDAO.queryBySessionKey(student1.getSessionKey()).getId(),attendStudents.getStudentsList().get(0).getId());
         assertEquals(studentDAO.queryBySessionKey(student2.getSessionKey()).getId(),attendStudents.getStudentsList().get(1).getId());
 
+        log.info(attendStudents.getStudentsList().toString());
+
     }
 
     //对某门课进行评价
