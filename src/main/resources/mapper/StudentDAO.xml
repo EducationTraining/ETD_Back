@@ -54,4 +54,13 @@
         (#{userName}, #{sessionKey}, #{createTime})
     </insert>
 
+    <select id="queryLatestTwoCourses" resultType="com.etd.etdservice.bean.course.Course">
+        SELECT c.*
+        FROM course_student cs, courses c
+        WHERE cs.`student_id` = #{studentId} AND cs.`course_id` = c.`id`
+        ORDER BY cs.`create_time`
+        DESC
+        LIMIT 2
+    </select>
+
 </mapper>

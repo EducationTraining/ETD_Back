@@ -1,11 +1,16 @@
 package com.etd.etdservice.dao;
 
+import com.etd.etdservice.bean.BaseResponse;
+import com.etd.etdservice.bean.CourseStudent;
 import com.etd.etdservice.bean.course.Course;
+import com.etd.etdservice.bean.users.Teacher;
+import com.etd.etdservice.serivce.CourseService;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -60,6 +65,13 @@ public interface CourseDAO {
 	boolean create(Course course);
 
 	/**
+	 * 根据课程ID查询任课老师
+	 * @param courseId
+	 * @return Teacher
+	 */
+	Teacher queryTeacherByCourseId(Integer courseId);
+
+	/**
 	 * 删除所有课程，此方法用于测试
 	 * @return
 	 */
@@ -71,4 +83,5 @@ public interface CourseDAO {
 	 * @return
 	 */
 	boolean deleteByCourseId(int id);
+
 }
