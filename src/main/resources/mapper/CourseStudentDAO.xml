@@ -50,14 +50,14 @@
     </delete>
 
     <!--获取某学生是否参加了某门课程-->
-    <select id="isAttendCourse" resultType="CourseStudent">
+    <select id="isAttendCourse" resultType="com.etd.etdservice.bean.CourseStudent">
         SELECT <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_columns"/>
         FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name"/>
         WHERE course_id=#{param1} AND student_id=#{param2}
     </select>
 
     <!--根据学生ID查询课程ID-->
-    <select id="getAttendedCourses" parameterType="int" resultType="Course">
+    <select id="getAttendedCourses" parameterType="java.lang.Integer" resultType="com.etd.etdservice.bean.course.Course">
         SELECT c.*
         FROM <include refid="com.etd.etdservice.dao.CourseStudentDAO.tb_name"/> cs, courses c
         WHERE student_id = #{studentId} AND cs.course_id = c.id;
@@ -73,7 +73,7 @@
     </insert>
 
     <!--获取某门课参加的学生-->
-    <select id="getAttendStudents" resultType="Student">
+    <select id="getAttendStudents" resultType="com.etd.etdservice.bean.users.Student">
       SELECT s.*
       FROM course_student cs,students s
       WHERE course_id = #{courseId}

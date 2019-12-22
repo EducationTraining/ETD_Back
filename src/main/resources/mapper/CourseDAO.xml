@@ -89,7 +89,7 @@
         (#{teacherId}, #{courseNum}, #{name}, #{pages}, #{startTime}, #{weeks}, #{description}, #{createTime}, #{note})
     </insert>
 
-    <select id="queryTeacherByCourseId" resultType="Teacher">
+    <select id="queryTeacherByCourseId" resultType="com.etd.etdservice.bean.users.Teacher">
         SELECT t.*
         FROM courses c, teachers t
         WHERE c.`id` = #{courseId} AND c.`teacher_id`=t.`id`;
