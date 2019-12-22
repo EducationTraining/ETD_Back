@@ -16,7 +16,7 @@
             <if test="userName!=null"> `user_name`=#{userName}, </if>
             <if test="sessionKey!=null"> `session_key`=#{sessionKey}, </if>
             <if test="phone!=null">`phone`=#{phone},</if>
-            <if test="email!=null">`email`=#{email},</if>
+            <if test="email!=null">`email`=#{email}</if>
         </set>
     </sql>
 
