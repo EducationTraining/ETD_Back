@@ -4,21 +4,21 @@ import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.CourseStudent;
 import com.etd.etdservice.bean.CourseStudentRemark;
 import com.etd.etdservice.bean.course.Course;
+import com.etd.etdservice.bean.course.CourseMaterial;
+import com.etd.etdservice.bean.course.SubcourseToMaterial;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
 import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
+import com.etd.etdservice.bean.course.response.ResponseUploadMaterial;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetStudent;
 import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseGetTeacher;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
-import com.etd.etdservice.dao.CourseDAO;
-import com.etd.etdservice.dao.CourseStudentDAO;
-import com.etd.etdservice.dao.StudentDAO;
-import com.etd.etdservice.dao.TeacherDAO;
+import com.etd.etdservice.dao.*;
 import com.etd.etdservice.serivce.CourseService;
 import com.etd.etdservice.utils.FileHelper;
 import com.github.pagehelper.Page;
@@ -38,14 +38,20 @@ import java.util.List;
 @Service
 @Slf4j
 public class CourseServiceImpl implements CourseService {
-
-
-
 	@Autowired
 	private StudentDAO studentDAO;
 
 	@Autowired
 	private CourseDAO courseDAO;
+
+	@Autowired
+	private CourseMaterialDAO courseMaterialDAO;
+
+	@Autowired
+	private SubcourseToMaterialDAO subcourseToMaterialDAO;
+
+	@Autowired
+	private SubcourseDAO subcourseDAO;
 
 	private static TeacherDAO teacherDAO;
 
@@ -53,6 +59,9 @@ public class CourseServiceImpl implements CourseService {
 
 	@Value("${image_root_path}")
 	private String imageRootPath;
+
+	@Value("${video_root_path}")
+	private String videoRootPath;
 
 	@Value("${url_starter}")
 	private String urlStarter;
@@ -365,7 +374,7 @@ public class CourseServiceImpl implements CourseService {
 
 			boolean status = courseStudentDAO.remarkCourse(courseStudentRemark);
 
-			if (status == true) {
+			if (status) {
 				// 评价成功
 				return new BaseResponse(true, "");
 			} else {
@@ -376,5 +385,41 @@ public class CourseServiceImpl implements CourseService {
 			return new BaseResponse(false,"not attend the course");
 		}
 
+	}
+
+	@Override
+	public ResponseUploadMaterial uploadSubcourseMaterial(MultipartFile video, Integer subcourseId, String sessionKey) {
+		if (video == null || subcourseId == null || sessionKey == null) {
+			return new ResponseUploadMaterial(false, "param error", new CourseMaterial());
+		}
+		if (!isValidTeacherSessoinKey(sessionKey)) {
+			return new ResponseUploadMaterial(false, "invalid sessionKey", new CourseMaterial());
+		}
+		if (subcourseDAO.queryById(subcourseId) == null) {
+			return new ResponseUploadMaterial(false, "invalid subcourseId", new CourseMaterial());
+		}
+		try {
+			String videoUrl = FileHelper.uploadVideo(video, videoRootPath, subcourseId, urlStarter);
+			CourseMaterial courseMaterial = new CourseMaterial();
+			courseMaterial.setVideoUrl(videoUrl);
+			if (!courseMaterialDAO.create(courseMaterial)) {
+				return new ResponseUploadMaterial(false, "Unable to update material to database", new CourseMaterial());
+			}
+			int materialId = courseMaterial.getId();
+			SubcourseToMaterial subcourseToMaterial = new SubcourseToMaterial();
+			subcourseToMaterial.setMaterialId(materialId);
+			subcourseToMaterial.setSubcourseId(subcourseId);
+			if (!subcourseToMaterialDAO.create(subcourseToMaterial)) {
+				return new ResponseUploadMaterial(false, "Unable to update subcourseToMaterial to database", new CourseMaterial());
+			}
+			return new ResponseUploadMaterial(true, "", courseMaterial);
+		} catch(Exception e) {
+			return new ResponseUploadMaterial(false, e.getMessage(), null);
+		}
+	}
+
+	private boolean isValidTeacherSessoinKey(String sessionKey) {
+		Teacher teacher = teacherDAO.queryBySessionKey(sessionKey);
+		return teacher != null;
 	}
 }

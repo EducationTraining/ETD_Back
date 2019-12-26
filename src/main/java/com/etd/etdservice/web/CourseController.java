@@ -4,6 +4,7 @@ import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
+import com.etd.etdservice.bean.course.response.ResponseUploadMaterial;
 import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import com.etd.etdservice.serivce.CourseService;
@@ -40,6 +41,13 @@ public class CourseController {
 	                                                   @RequestParam("courseId")Integer courseId,
 	                                                   @RequestParam("sessionKey") String sessionKey) {
 		return service.uploadCoursePic(file, courseId, sessionKey);
+	}
+
+	@RequestMapping(value = "/upload-material", method = RequestMethod.POST)
+	public ResponseUploadMaterial uploadCourseMaterial(@RequestParam("file") MultipartFile video,
+	                                                   @RequestParam("subcourseId")Integer subcourseId,
+	                                                   @RequestParam("sessionKey") String sessionKey) {
+		return service.uploadSubcourseMaterial(video, subcourseId, sessionKey);
 	}
 
 	@RequestMapping(value = "/course", method = RequestMethod.POST)
