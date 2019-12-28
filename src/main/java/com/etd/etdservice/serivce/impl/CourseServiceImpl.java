@@ -6,9 +6,11 @@ import com.etd.etdservice.bean.CourseStudentRemark;
 import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
+import com.etd.etdservice.bean.course.request.RequestUploadCourse;
 import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
+import com.etd.etdservice.bean.course.response.ResponseUploadCourse;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetStudent;
@@ -38,9 +40,6 @@ import java.util.List;
 @Service
 @Slf4j
 public class CourseServiceImpl implements CourseService {
-
-
-
 	@Autowired
 	private StudentDAO studentDAO;
 
@@ -183,6 +182,20 @@ public class CourseServiceImpl implements CourseService {
 			log.warn("teacher (id: " + teacher.getId() + ") try to update course(id: " + course.getId() + ") but fail!");
 			return new BaseResponse(false, "update courseInfo failed");
 		}
+	}
+
+	@Override
+	public ResponseUploadCourse uploadCourseInfo(RequestUploadCourse request) {
+		String sessionKey = request.getSessionKey();
+		Teacher teacher = teacherDAO.queryBySessionKey(sessionKey);
+		if (teacher == null) {
+			return new ResponseUploadCourse(false, "invalid sessionKey", null);
+		}
+		Course course = RequestUploadCourse.fromRequestToBean(request, teacher.getId());
+		if (!courseDAO.create(course)) {
+			return new ResponseUploadCourse(false, "invalid sessionKey", null);
+		}
+		return new ResponseUploadCourse(true, "", course.getId());
 	}
 
 
@@ -339,6 +352,20 @@ public class CourseServiceImpl implements CourseService {
 			// 如果不是，返回课程号错误
 			return new ResponseGetStudents(false, "courseId error", null);
 		}
+	}
+
+	@Override
+	public ResponseCourse getCourse(Integer courseId) {
+		if (courseId == null) {
+			return new ResponseCourse();
+		}
+		Course course = courseDAO.queryById(courseId);
+		Teacher teacher = teacherDAO.queryById(course.getTeacherId());
+		if (teacher == null) {
+			return new ResponseCourse();
+		}
+		return ResponseCourse.fromBeanToResponse(course, ResponseGetTeacher.fromBeanToResponse(teacher),
+				courseStudentDAO.getStudentCountsByCourseId(courseId));
 	}
 
 

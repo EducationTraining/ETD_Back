@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.etd</groupId>
     <artifactId>etdservice</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>ETDService</name>
     <description>Backend support for ETD.</description>

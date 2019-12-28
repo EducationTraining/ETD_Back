@@ -1,5 +1,6 @@
 package com.etd.etdservice.bean.course.response;
 
+import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.users.response.ResponseGetTeacher;
 import lombok.AllArgsConstructor;
