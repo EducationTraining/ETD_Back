@@ -3,10 +3,13 @@ package com.etd.etdservice.serivce;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
+import com.etd.etdservice.bean.course.request.RequestUploadCourse;
+import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
 import com.etd.etdservice.bean.course.response.ResponseUpdateCoursePages;
 import com.etd.etdservice.bean.course.response.ResponseUploadMaterial;
+import com.etd.etdservice.bean.course.response.ResponseUploadCourse;
 import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +52,13 @@ public interface CourseService {
 	BaseResponse updateCourseInfo(RequestUpdateCourse request);
 
 	/**
+	 * 更新课程信息 注意对startTime的处理
+	 * @param request a RequestUploadCourse Object
+	 * @return
+	 */
+	ResponseUploadCourse uploadCourseInfo(RequestUploadCourse request);
+
+	/**
 	 * 选课
 	 * @param courseId
 	 * @param sessionKey 学生sessionKey
@@ -86,6 +96,13 @@ public interface CourseService {
 	 * @return
 	 */
 	ResponseGetStudents getAttendStudents(Integer courseId, String sessionKey);
+
+	/**
+	 * 获取某门课程
+	 * @param courseId
+	 * @return
+	 */
+	ResponseCourse getCourse(Integer courseId);
 
 	/**
 	 * 对某门课进行评价

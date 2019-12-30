@@ -7,6 +7,9 @@ import com.etd.etdservice.bean.course.request.RequestUpdateCoursePages;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.course.response.ResponseUpdateCoursePages;
 import com.etd.etdservice.bean.course.response.ResponseUploadMaterial;
+import com.etd.etdservice.bean.course.request.RequestUploadCourse;
+import com.etd.etdservice.bean.course.response.ResponseCourse;
+import com.etd.etdservice.bean.course.response.ResponseUploadCourse;
 import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import com.etd.etdservice.serivce.CourseService;
@@ -52,9 +55,19 @@ public class CourseController {
 		return service.uploadSubcourseMaterial(video, subcourseId, sessionKey);
 	}
 
+	@RequestMapping(value = "/upload-course", method = RequestMethod.POST)
+	public ResponseUploadCourse uploadCourseInfo(@RequestBody RequestUploadCourse request) {
+		return service.uploadCourseInfo(request);
+	}
+
 	@RequestMapping(value = "/course", method = RequestMethod.POST)
 	public BaseResponse updateCourseInfo(@RequestBody RequestUpdateCourse request) {
 		return service.updateCourseInfo(request);
+	}
+
+	@RequestMapping(value = "/course", method = RequestMethod.GET)
+	public ResponseCourse getCourseInfo(@RequestParam("courseId") Integer courseId) {
+		return service.getCourse(courseId);
 	}
 
 	@RequestMapping(value = "/attend", method = RequestMethod.POST)

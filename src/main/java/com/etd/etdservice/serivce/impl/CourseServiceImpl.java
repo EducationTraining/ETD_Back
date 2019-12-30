@@ -12,6 +12,7 @@ import com.etd.etdservice.bean.course.Subcourse;
 import com.etd.etdservice.bean.course.SubcourseToMaterial;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
+import com.etd.etdservice.bean.course.request.RequestUploadCourse;
 import com.etd.etdservice.bean.course.response.*;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
@@ -110,6 +111,9 @@ public class CourseServiceImpl implements CourseService {
 	 * @return
 	 */
 	private String processOriginalPages(String pages) {
+		if (pages == null || pages.equals("")) {
+			return pages;
+		}
 		JSONArray subcourseArray = JSON.parseArray(pages);
 		// 遍历每一个一级子课程
 		for (int i=0; i<subcourseArray.size(); i++) {
@@ -220,6 +224,20 @@ public class CourseServiceImpl implements CourseService {
 			log.warn("teacher (id: " + teacher.getId() + ") try to update course(id: " + course.getId() + ") but fail!");
 			return new BaseResponse(false, "update courseInfo failed");
 		}
+	}
+
+	@Override
+	public ResponseUploadCourse uploadCourseInfo(RequestUploadCourse request) {
+		String sessionKey = request.getSessionKey();
+		Teacher teacher = teacherDAO.queryBySessionKey(sessionKey);
+		if (teacher == null) {
+			return new ResponseUploadCourse(false, "invalid sessionKey", null);
+		}
+		Course course = RequestUploadCourse.fromRequestToBean(request, teacher.getId());
+		if (!courseDAO.create(course)) {
+			return new ResponseUploadCourse(false, "invalid sessionKey", null);
+		}
+		return new ResponseUploadCourse(true, "", course.getId());
 	}
 
 
@@ -368,6 +386,20 @@ public class CourseServiceImpl implements CourseService {
 		}
 	}
 
+	@Override
+	public ResponseCourse getCourse(Integer courseId) {
+		if (courseId == null) {
+			return new ResponseCourse();
+		}
+		Course course = courseDAO.queryById(courseId);
+		Teacher teacher = teacherDAO.queryById(course.getTeacherId());
+		if (teacher == null) {
+			return new ResponseCourse();
+		}
+		String processedPages = processOriginalPages(course.getPages());
+		return ResponseCourse.fromBeanToResponse(course, ResponseGetTeacher.fromBeanToResponse(teacher),
+				courseStudentDAO.getStudentCountsByCourseId(courseId), processedPages);
+	}
 
 	/**
 	 * 对某门课进行评价
