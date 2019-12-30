@@ -24,14 +24,23 @@ public class ResponseCourse {
 	private String note;
 	private String avatarUrl;
 
-	public static ResponseCourse fromBeanToResponse(Course bean, ResponseGetTeacher teacher, Integer studentNum) {
+	/**
+	 *
+	 * @param bean
+	 * @param teacher
+	 * @param studentNum 上课人数
+	 * @param processedPages 带标题和subcourse id的课程目录json字符串
+	 * @return
+	 */
+	public static ResponseCourse fromBeanToResponse(Course bean, ResponseGetTeacher teacher, Integer studentNum, String processedPages) {
 		ResponseCourse response = new ResponseCourse();
+		BeanUtils.copyProperties(bean, response);
 		if (bean.getStartTime() != null) {
 			response.setStartTime(bean.getStartTime().getTime());
 		}
 		response.setTeacher(teacher);
 		response.setStudentNum(studentNum);
-		BeanUtils.copyProperties(bean, response);
+		response.setPages(processedPages);
 		return response;
 	}
 }

@@ -1,6 +1,8 @@
 package com.etd.etdservice.service;
 
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
@@ -8,14 +10,12 @@ import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
 import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
+import com.etd.etdservice.bean.course.response.ResponseUpdateCoursePages;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
-import com.etd.etdservice.dao.CourseDAO;
-import com.etd.etdservice.dao.StudentDAO;
-import com.etd.etdservice.dao.TeacherDAO;
-import com.etd.etdservice.dao.UserDAOTest;
+import com.etd.etdservice.dao.*;
 import com.etd.etdservice.serivce.CourseService;
 import com.etd.etdservice.serivce.impl.CourseServiceImpl;
 import com.etd.etdservice.utils.DoubleUtil;
@@ -33,8 +33,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.Assert.*;
 
 
 @RunWith(SpringRunner.class)
@@ -50,12 +50,11 @@ public class CourseServiceTest {
     @Autowired
     private CourseDAO courseDAO;
 
-    private  static TeacherDAO teacherDAO;
     @Autowired
-    public  void setTeacherDAO(TeacherDAO teacherDAO) {
-        CourseServiceTest.teacherDAO = teacherDAO;
-    }
+    private SubcourseDAO subcourseDAO;
 
+    @Autowired
+    private TeacherDAO teacherDAO;
 
     @Value("${image_root_path}")
     private String imageRootPath;
@@ -72,10 +71,11 @@ public class CourseServiceTest {
 
     public static Course mockCourse() {
         Course course = new Course();
-        Teacher teacher = UserDAOTest.mockTeacher();
-        teacherDAO.create(teacher);
-        Teacher teacherRes = teacherDAO.queryByUserName(teacher.getUserName());
-        course.setTeacherId(teacherRes.getId());
+        // Teacher teacher = UserDAOTest.mockTeacher();
+        // teacherDAO.create(teacher);
+        // Teacher teacherRes = teacherDAO.queryByUserName(teacher.getUserName());
+        // course.setTeacherId(teacherRes.getId());
+        course.setTeacherId(1);
         course.setCourseNum(StringUtil.generateRandomString("courseNUm"));
         course.setAvatarUrl(StringUtil.generateRandomString("avatarUrl"));
         course.setCreateTime(new Date());
@@ -387,5 +387,50 @@ public class CourseServiceTest {
         request.setCourseId(49521354);
         response = courseService.updateCourseInfo(request);
         Assert.assertFalse(response.isSuccess());
+    }
+
+    @Test
+    public void testUpdateCoursePages() {
+        // mock
+        JSONArray mockSubcourseArray = new JSONArray();
+        Course course = mockCourse();
+        courseDAO.create(course);
+        // Comment courseDAO.create(course) and use next line to test update pages for same course.
+        // course.setId(142);
+        for (int i=1; i<=3; i++) {
+            JSONObject firstSubcourseObj = new JSONObject();
+            firstSubcourseObj.put("title", "title" + i);
+            JSONArray secondSubcourseArray = new JSONArray();
+            for (int j=1; j<=3; j++) {
+                JSONObject secondSubcourseObj = new JSONObject();
+                secondSubcourseObj.put("title", "title" + i + "." + j);
+                secondSubcourseArray.add(secondSubcourseObj);
+            }
+            firstSubcourseObj.put("subcourses", secondSubcourseArray);
+            mockSubcourseArray.add(firstSubcourseObj);
+        }
+        String mockSubcourseArrayStr = mockSubcourseArray.toJSONString();
+        log.info("MOCK: " + mockSubcourseArrayStr);
+        // May need change sessionKey to pass the test.
+        ResponseUpdateCoursePages response = courseService.updateCoursePages(
+                mockSubcourseArrayStr, course.getId(), "6c1468eeef3890e927fa7e2c3cf8f8a8");
+        log.info(response.getErrMsg());
+        assertTrue(response.isSuccess());
+        String resSubcourseArrayStr = response.getPages();
+        log.info("RES:" + resSubcourseArrayStr);
+        JSONArray resSubcourseArray = JSONArray.parseArray(resSubcourseArrayStr);
+        for (int i=0; i<resSubcourseArray.size(); i++) {
+            JSONObject firstSubcourseObj = resSubcourseArray.getJSONObject(i);
+            Integer subcourseId = firstSubcourseObj.getInteger("id");
+            // Make sure first subcourse exists.
+            assertNotNull(subcourseDAO.queryById(subcourseId));
+            JSONArray secondSubcourseArray = firstSubcourseObj.getJSONArray("subcourses");
+            for (int j=0; j<secondSubcourseArray.size(); j++) {
+                JSONObject secondSubcourseObj = secondSubcourseArray.getJSONObject(j);
+                subcourseId = secondSubcourseObj.getInteger("id");
+                // Make sure second subcourse exists.
+                assertNotNull(subcourseDAO.queryById(subcourseId));
+            }
+        }
     }
 }

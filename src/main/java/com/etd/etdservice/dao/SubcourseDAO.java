@@ -28,4 +28,12 @@ public interface SubcourseDAO {
 	 * @return
 	 */
 	Subcourse queryById(int id);
+
+	/**
+	 *
+	 * @param courseId
+	 * @param title
+	 * @return
+	 */
+	Subcourse queryByTitleAndCourseId(@Param("courseId") int courseId, @Param("title") String title);
 }

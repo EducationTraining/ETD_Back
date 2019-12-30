@@ -31,6 +31,13 @@
         WHERE #{id} = `id`
     </select>
 
+    <select id="queryByTitleAndCourseId" resultType="com.etd.etdservice.bean.course.Subcourse">
+        SELECT <include refid="tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.SubcourseDAO.tb_name" />
+        WHERE #{courseId} = `course_id` AND #{title} = `title`
+    </select>
+
+
     <update id="update" parameterType="com.etd.etdservice.bean.course.Subcourse">
         UPDATE <include refid="com.etd.etdservice.dao.SubcourseDAO.tb_name" />
         <include refid="com.etd.etdservice.dao.SubcourseDAO.update_columns" />

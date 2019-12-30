@@ -3,7 +3,9 @@ package com.etd.etdservice.web;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
+import com.etd.etdservice.bean.course.request.RequestUpdateCoursePages;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
+import com.etd.etdservice.bean.course.response.ResponseUpdateCoursePages;
 import com.etd.etdservice.bean.course.response.ResponseUploadMaterial;
 import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
@@ -83,6 +85,14 @@ public class CourseController {
 	@RequestMapping(value = "/remark", method = RequestMethod.POST)
 	public BaseResponse remarkCourse(@RequestBody RequestRemarkCourse request) {
 		return service.remarkCourse(request);
+	}
+
+	@RequestMapping(value = "/pages", method = RequestMethod.POST)
+	public ResponseUpdateCoursePages updateCoursePages(@RequestBody RequestUpdateCoursePages request) {
+		String sessionKey = request.getSessionKey();
+		String pages = request.getPages();
+		Integer courseId = request.getCourseId();
+		return service.updateCoursePages(pages, courseId, sessionKey);
 	}
 
 }

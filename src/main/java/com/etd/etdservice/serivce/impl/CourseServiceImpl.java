@@ -1,17 +1,18 @@
 package com.etd.etdservice.serivce.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.CourseStudent;
 import com.etd.etdservice.bean.CourseStudentRemark;
 import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.course.CourseMaterial;
+import com.etd.etdservice.bean.course.Subcourse;
 import com.etd.etdservice.bean.course.SubcourseToMaterial;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
-import com.etd.etdservice.bean.course.response.ResponseCourse;
-import com.etd.etdservice.bean.course.response.ResponseGetCourses;
-import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
-import com.etd.etdservice.bean.course.response.ResponseUploadMaterial;
+import com.etd.etdservice.bean.course.response.*;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetStudent;
@@ -81,11 +82,11 @@ public class CourseServiceImpl implements CourseService {
 	/**
 	 * the number of hottest courses.
 	 */
-	public static final int HOTTEST_COURSE_NUMBER = 5;
+	private static final int HOTTEST_COURSE_NUMBER = 5;
 
-	public static final int LATEST_COURSE_NUMBER = 5;
+	private static final int LATEST_COURSE_NUMBER = 5;
 
-	private static ResponseGetCourses fromCourses(List<Course> courses) {
+	private ResponseGetCourses fromCourses(List<Course> courses) {
 		List<ResponseCourse> courseList = new ArrayList<>();
 		if(courses == null || courses.size() == 0) {
 			return new ResponseGetCourses(false, "no selected courses!", courseList);
@@ -96,11 +97,38 @@ public class CourseServiceImpl implements CourseService {
 
 			ResponseGetTeacher responseGetTeacher = ResponseGetTeacher.fromBeanToResponse(teacher);
 			Integer studentNum = courseStudentDAO.getStudentCountsByCourseId(course.getId());
-
-			ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(course, responseGetTeacher, studentNum);
+			String processedPages = processOriginalPages(course.getPages());
+			ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(course, responseGetTeacher, studentNum, processedPages);
 			courseList.add(responseCourse);
 		}
 		return new ResponseGetCourses(true, "", courseList);
+	}
+
+	/**
+	 * 将只含id subcourse目录json字符串处理为含完整信息的目录json字符串
+	 * @param pages
+	 * @return
+	 */
+	private String processOriginalPages(String pages) {
+		JSONArray subcourseArray = JSON.parseArray(pages);
+		// 遍历每一个一级子课程
+		for (int i=0; i<subcourseArray.size(); i++) {
+			JSONObject firstSubcourseObj = subcourseArray.getJSONObject(i);
+			// 为每个一级子课程查询子课程信息
+			Integer id = firstSubcourseObj.getInteger("id");
+			Subcourse firstSubcourse = subcourseDAO.queryById(id);
+			firstSubcourseObj.put("title", firstSubcourse.getTitle());
+			// 遍历二级子课程
+			JSONArray secondSubcourses = firstSubcourseObj.getJSONArray("subcourses");
+			for (int j=0; j<secondSubcourses.size(); j++) {
+				// 为每个二级子课程查询子课程信息
+				JSONObject secondSubcourseObj = secondSubcourses.getJSONObject(j);
+				Integer secondId = secondSubcourseObj.getInteger("id");
+				Subcourse secondSubcourse = subcourseDAO.queryById(secondId);
+				secondSubcourseObj.put("title", secondSubcourse.getTitle());
+			}
+		}
+		return JSON.toJSONString(subcourseArray);
 	}
 
 
@@ -214,7 +242,7 @@ public class CourseServiceImpl implements CourseService {
 		CourseStudent courseStudent = new CourseStudent(0, courseId, studentId, createDate);
 
 		boolean status = courseStudentDAO.attendCourse(courseStudent);
-		if(status == true){
+		if(status){
 			//选课成功
 			return new BaseResponse(true, "");
 		}else{
@@ -240,7 +268,7 @@ public class CourseServiceImpl implements CourseService {
 		Integer studentId = student.getId();
 
 		boolean status = courseStudentDAO.withdrawCourse(courseId, studentId);
-		if(status == true){
+		if(status){
 			//退课成功
 			return new BaseResponse(true, "");
 		}else{
@@ -294,17 +322,7 @@ public class CourseServiceImpl implements CourseService {
 		// 根据studentId查已选课程
 		List<Course> courseList = courseStudentDAO.getAttendedCourses(studentId);
 
-		List<ResponseCourse> responseCourses = new ArrayList<>();
-
-		for (Course course : courseList) {
-			Teacher teacher = courseDAO.queryTeacherByCourseId(course.getId());
-			ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(course, ResponseGetTeacher.fromBeanToResponse(teacher), studentId);
-			responseCourses.add(responseCourse);
-		}
-
-		ResponseGetCourses attendedCourses = new ResponseGetCourses(true, "", responseCourses);
-
-		return attendedCourses;
+		return fromCourses(courseList);
 
 	}
 
@@ -329,18 +347,18 @@ public class CourseServiceImpl implements CourseService {
 			List<ResponseGetStudent> studentsList = new ArrayList<>();
 
 			for (Student attendStudent : attendStudents) {
-				// 获取该学生最近两门课
-				List<Course> latestTwoCourses = studentDAO.queryLatestTwoCourses(attendStudent.getId());
-				List<ResponseCourse> latestTwoResponseCourses = new ArrayList<>();
-				for (Course courseC : latestTwoCourses) {
-					Teacher teacherT = teacherDAO.queryById(courseC.getTeacherId());
-					ResponseGetTeacher responseGetTeacher = ResponseGetTeacher.fromBeanToResponse(teacherT);
-					Integer studentNum = courseStudentDAO.getStudentCountsByCourseId(courseC.getId());
-					ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(courseC, responseGetTeacher, studentNum);
-					latestTwoResponseCourses.add(responseCourse);
-				}
-
-				ResponseGetStudent responseGetStudent = ResponseGetStudent.fromBeanToResponse(attendStudent, latestTwoResponseCourses);
+//				// 获取该学生最近两门课
+//				List<Course> latestTwoCourses = studentDAO.queryLatestTwoCourses(attendStudent.getId());
+//				List<ResponseCourse> latestTwoResponseCourses = new ArrayList<>();
+//				for (Course courseC : latestTwoCourses) {
+//					Teacher teacherT = teacherDAO.queryById(courseC.getTeacherId());
+//					ResponseGetTeacher responseGetTeacher = ResponseGetTeacher.fromBeanToResponse(teacherT);
+//					Integer studentNum = courseStudentDAO.getStudentCountsByCourseId(courseC.getId());
+//					ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(courseC, responseGetTeacher, studentNum, null);
+//					latestTwoResponseCourses.add(responseCourse);
+//				}
+//				ResponseGetStudent responseGetStudent = ResponseGetStudent.fromBeanToResponse(attendStudent, latestTwoResponseCourses);
+				ResponseGetStudent responseGetStudent = ResponseGetStudent.fromBeanToResponse(attendStudent, null);
 				studentsList.add(responseGetStudent);
 			}
 			return new ResponseGetStudents(true, "", studentsList);
@@ -392,7 +410,7 @@ public class CourseServiceImpl implements CourseService {
 		if (video == null || subcourseId == null || sessionKey == null) {
 			return new ResponseUploadMaterial(false, "param error", new CourseMaterial());
 		}
-		if (!isValidTeacherSessoinKey(sessionKey)) {
+		if (isTeacherSessionKeyValid(sessionKey)) {
 			return new ResponseUploadMaterial(false, "invalid sessionKey", new CourseMaterial());
 		}
 		if (subcourseDAO.queryById(subcourseId) == null) {
@@ -414,12 +432,81 @@ public class CourseServiceImpl implements CourseService {
 			}
 			return new ResponseUploadMaterial(true, "", courseMaterial);
 		} catch(Exception e) {
-			return new ResponseUploadMaterial(false, e.getMessage(), null);
+			return new ResponseUploadMaterial(false, e.getMessage(), new CourseMaterial());
 		}
 	}
 
-	private boolean isValidTeacherSessoinKey(String sessionKey) {
+	@Override
+	public ResponseUpdateCoursePages updateCoursePages(String pages, Integer courseId, String sessionKey) {
+		if (pages == null || sessionKey == null) {
+			return new ResponseUpdateCoursePages(false, "param error", "");
+		}
+		if (isTeacherSessionKeyValid(sessionKey)) {
+			return new ResponseUpdateCoursePages(false, "invalid sessionKey", "");
+		}
+		Course course = courseDAO.queryById(courseId);
+		if (course == null) {
+			return new ResponseUpdateCoursePages(false,
+					"cannot find course with id " + courseId, "");
+		}
+		try {
+			// 用来存储返回目录字符串的json array,其包含所有subcourse的信息
+			JSONArray subcourseArray = JSON.parseArray(pages);
+			// 用来存储最终存放进course表里pages字符串的json array,其只存id
+			JSONArray resSubcourseArray = new JSONArray();
+			// 遍历每一个一级子课程
+			for (int i=0; i<subcourseArray.size(); i++) {
+				JSONObject firstSubcourseObj = subcourseArray.getJSONObject(i);
+				JSONObject firstResObj = new JSONObject();
+				// 为每个一级子课程查询子课程id
+				String title = firstSubcourseObj.getString("title");
+				Subcourse firstSubcourse = getOrCreateSubcourseByTitleAndCourseId(title, courseId);
+				firstSubcourseObj.put("id", firstSubcourse.getId());
+				firstResObj.put("id", firstSubcourse.getId());
+				JSONArray resSubcourses = new JSONArray();
+				// 遍历每一个二级子课程
+				JSONArray secondSubcourses = firstSubcourseObj.getJSONArray("subcourses");
+				for (int j=0; j<secondSubcourses.size(); j++) {
+					// 为每个二级子课程查询子课程id
+					JSONObject secondSubcourseObj = secondSubcourses.getJSONObject(j);
+					JSONObject secondResObj = new JSONObject();
+					String secondtitle = secondSubcourseObj.getString("title");
+					Subcourse secondSubcourse = getOrCreateSubcourseByTitleAndCourseId(secondtitle, courseId);
+					secondSubcourseObj.put("id", secondSubcourse.getId());
+					secondResObj.put("id", secondSubcourse.getId());
+					resSubcourses.add(secondResObj);
+				}
+				firstResObj.put("subcourses", resSubcourses);
+				resSubcourseArray.add(firstResObj);
+			}
+
+			String resPagesStr = JSON.toJSONString(resSubcourseArray);
+			course.setPages(resPagesStr);
+			courseDAO.update(course);
+
+			String pagesStr = JSON.toJSONString(subcourseArray);
+			return new ResponseUpdateCoursePages(true, "", pagesStr);
+		} catch (Exception e) {
+			return new ResponseUpdateCoursePages(false, e.getMessage(), "");
+		}
+	}
+
+	private Subcourse getOrCreateSubcourseByTitleAndCourseId(String title, int courseId) {
+		Subcourse subcourse = subcourseDAO.queryByTitleAndCourseId(courseId, title);
+		if (subcourse != null) {
+			return subcourse;
+		} else {
+			// 如果数据库里没有对应标题子课程，说明此目录项为新增的，需要为其创建子课程
+			Subcourse newSubcourse = new Subcourse();
+			newSubcourse.setTitle(title);
+			newSubcourse.setCourseId(courseId);
+			subcourseDAO.create(newSubcourse);
+			return newSubcourse;
+		}
+	}
+
+	private boolean isTeacherSessionKeyValid(String sessionKey) {
 		Teacher teacher = teacherDAO.queryBySessionKey(sessionKey);
-		return teacher != null;
+		return teacher == null;
 	}
 }

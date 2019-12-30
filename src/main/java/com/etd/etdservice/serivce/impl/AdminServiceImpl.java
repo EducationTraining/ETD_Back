@@ -1,7 +1,11 @@
 package com.etd.etdservice.serivce.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.Course;
+import com.etd.etdservice.bean.course.Subcourse;
 import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.users.Admin;
@@ -9,10 +13,7 @@ import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetAdmin;
 import com.etd.etdservice.bean.users.response.ResponseGetTeacher;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
-import com.etd.etdservice.dao.AdminDAO;
-import com.etd.etdservice.dao.CourseDAO;
-import com.etd.etdservice.dao.CourseStudentDAO;
-import com.etd.etdservice.dao.TeacherDAO;
+import com.etd.etdservice.dao.*;
 import com.etd.etdservice.serivce.AdminService;
 import com.etd.etdservice.utils.MD5Util;
 import com.github.pagehelper.Page;
@@ -31,6 +32,8 @@ public class AdminServiceImpl implements AdminService {
     private AdminDAO adminDAO;
     @Autowired
     private CourseDAO courseDAO;
+    @Autowired
+    private SubcourseDAO subcourseDAO;
     @Autowired
     private TeacherDAO teacherDAO;
     @Autowired
@@ -65,7 +68,8 @@ public class AdminServiceImpl implements AdminService {
             ResponseGetTeacher responseGetTeacher = ResponseGetTeacher.fromBeanToResponse(teacher);
             // 获取每门课的学生数量
             int num_stu = courseStudentDAO.getStudentCountsByCourseId(course.getId());
-            ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(course, responseGetTeacher, num_stu);
+            String processedPages = processOriginalPages(course.getPages());
+            ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(course, responseGetTeacher, num_stu, processedPages);
             coursesList.add(responseCourse);
         }
         if (coursesList.size() == 0) {
@@ -169,5 +173,32 @@ public class AdminServiceImpl implements AdminService {
         else {
             return new ResponseRegister(false, "invalid password", null);
         }
+    }
+
+    /**
+     * 将只含id subcourse目录json字符串处理为含完整信息的目录json字符串
+     * @param pages
+     * @return
+     */
+    private String processOriginalPages(String pages) {
+        JSONArray subcourseArray = JSON.parseArray(pages);
+        // 遍历每一个一级子课程
+        for (int i=0; i<subcourseArray.size(); i++) {
+            JSONObject firstSubcourseObj = subcourseArray.getJSONObject(i);
+            // 为每个一级子课程查询子课程信息
+            Integer id = firstSubcourseObj.getInteger("id");
+            Subcourse firstSubcourse = subcourseDAO.queryById(id);
+            firstSubcourseObj.put("title", firstSubcourse.getTitle());
+            // 遍历二级子课程
+            JSONArray secondSubcourses = firstSubcourseObj.getJSONArray("subcourses");
+            for (int j=0; j<secondSubcourses.size(); j++) {
+                // 为每个二级子课程查询子课程信息
+                JSONObject secondSubcourseObj = subcourseArray.getJSONObject(j);
+                Integer secondId = secondSubcourseObj.getInteger("id");
+                Subcourse secondSubcourse = subcourseDAO.queryById(secondId);
+                secondSubcourseObj.put("title", secondSubcourse.getTitle());
+            }
+        }
+        return JSON.toJSONString(subcourseArray);
     }
 }
