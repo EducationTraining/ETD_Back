@@ -1,7 +1,6 @@
 package com.etd.etdservice.dao;
 
 import com.etd.etdservice.bean.course.Course;
-import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.utils.DoubleUtil;
 import com.etd.etdservice.utils.StringUtil;
 import com.github.pagehelper.Page;
@@ -11,8 +10,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.List;
 
@@ -26,24 +27,12 @@ public class CourseDAOTest {
 	@Autowired
 	private CourseDAO courseDAO;
 
-	private static TeacherDAO teacherDAO;
-	@Autowired
-	public void setTeacherDAO(TeacherDAO teacherDAO){
-		this.teacherDAO = teacherDAO;
-	}
-
-
 	private static final int COURSE_NUM = 5;
 	private static final int COUNT = 5;
 
-
-
 	public static Course mockCourse() {
 		Course course = new Course();
-		Teacher teacher  = UserDAOTest.mockTeacher();
-		teacherDAO.create(teacher);
-		Teacher teacherRes = teacherDAO.queryByUserName(teacher.getUserName());
-		course.setTeacherId(teacherRes.getId());
+		course.setTeacherId(1);
 		course.setCourseNum(StringUtil.generateRandomString("courseNUm"));
 		course.setAvatarUrl(StringUtil.generateRandomString("avatarUrl"));
 		course.setCreateTime(new Date());

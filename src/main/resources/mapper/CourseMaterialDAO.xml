@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mabatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etd.etdservice.dao.CourseMaterialDAO">
+    <!-- 表名 -->
+    <sql id="tb_name">etd_db.course_materials</sql>
+    <!--表中所有字段-->
+    <sql id="tb_columns">
+        `id`, `video_url`
+	</sql>
+    <!-- useGeneratedKeys="true"  keyProperty="id"能够自动返回生成的主键 -->
+    <insert id="create" useGeneratedKeys="true"  keyProperty="id">
+        INSERT INTO <include refid="com.etd.etdservice.dao.CourseMaterialDAO.tb_name" />
+        (`video_url`)
+        VALUES
+        (#{videoUrl})
+    </insert>
+
+    <select id="queryById" resultType="com.etd.etdservice.bean.course.CourseMaterial">
+        SELECT <include refid="com.etd.etdservice.dao.CourseMaterialDAO.tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.CourseMaterialDAO.tb_name" />
+        WHERE #{id} = `id`
+    </select>
+</mapper>

@@ -7,6 +7,8 @@ import com.etd.etdservice.bean.course.request.RequestUploadCourse;
 import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
+import com.etd.etdservice.bean.course.response.ResponseUpdateCoursePages;
+import com.etd.etdservice.bean.course.response.ResponseUploadMaterial;
 import com.etd.etdservice.bean.course.response.ResponseUploadCourse;
 import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
@@ -108,4 +110,22 @@ public interface CourseService {
 	 * @return
 	 */
 	BaseResponse remarkCourse(RequestRemarkCourse request);
+
+	/**
+	 * 为某门子课程上传材料
+	 * @param video 视频文件
+	 * @param subcourseId 子课程id
+	 * @param sessionKey 老师sessionKey
+	 * @return a ResponseUploadMaterial contains courseMaterial
+	 */
+	ResponseUploadMaterial uploadSubcourseMaterial(MultipartFile video, Integer subcourseId, String sessionKey);
+
+	/**
+	 *
+	 * @param pages 课程目录json字符串 里面不包含subcourse id
+	 * @param courseId 课程id
+	 * @param sessionKey 老师sessionKey
+	 * @return
+	 */
+	ResponseUpdateCoursePages updateCoursePages(String pages, Integer courseId, String sessionKey);
 }

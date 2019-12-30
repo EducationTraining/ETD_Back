@@ -27,7 +27,7 @@
     </sql>
 
     <select id="queryLatestCourses" resultType="com.etd.etdservice.bean.course.Course">
-		SELECT <include refid="tb_columns" />
+		SELECT <include refid="com.etd.etdservice.dao.CourseDAO.tb_columns" />
 		FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
 		WHERE `status` = 1
 		ORDER BY `create_time`
@@ -36,7 +36,7 @@
     </select>
 
     <select id="queryHottestCourses" resultType="com.etd.etdservice.bean.course.Course">
-        SELECT <include refid="tb_columns" />
+        SELECT <include refid="com.etd.etdservice.dao.CourseDAO.tb_columns" />
         FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
         WHERE `status` = 1
         ORDER BY `score`
@@ -45,24 +45,24 @@
     </select>
 
     <select id="queryValidCourses" resultType="com.etd.etdservice.bean.course.Course">
-        SELECT <include refid="tb_columns" />
+        SELECT <include refid="com.etd.etdservice.dao.CourseDAO.tb_columns" />
         FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
         WHERE `status` = 1
     </select>
 
     <select id="queryAllCourses" resultType="com.etd.etdservice.bean.course.Course">
-        SELECT <include refid="tb_columns" />
+        SELECT <include refid="com.etd.etdservice.dao.CourseDAO.tb_columns" />
         FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
     </select>
 
     <select id="queryByCourseNum" resultType="com.etd.etdservice.bean.course.Course">
-        SELECT <include refid="tb_columns" />
+        SELECT <include refid="com.etd.etdservice.dao.CourseDAO.tb_columns" />
         FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
         WHERE #{courseNum} = `course_num`
     </select>
 
     <select id="queryById" resultType="com.etd.etdservice.bean.course.Course">
-        SELECT <include refid="tb_columns" />
+        SELECT <include refid="com.etd.etdservice.dao.CourseDAO.tb_columns" />
         FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
         WHERE #{id} = `id`
     </select>

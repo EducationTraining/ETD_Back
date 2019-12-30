@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mabatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etd.etdservice.dao.SubcourseToMaterialDAO">
+    <!-- 表名 -->
+    <sql id="tb_name">etd_db.subcourse_to_materials</sql>
+    <!--表中所有字段-->
+    <sql id="tb_columns">
+        `id`, `material_id`, `subcourse_id`
+	</sql>
+    <!-- useGeneratedKeys="true"  keyProperty="id"能够自动返回生成的主键 -->
+    <insert id="create" useGeneratedKeys="true"  keyProperty="id">
+        INSERT INTO <include refid="com.etd.etdservice.dao.SubcourseToMaterialDAO.tb_name" />
+        (`material_id`, `subcourse_id`)
+        VALUES
+        (#{materialId}, #{subcourseId})
+    </insert>
+
+    <select id="queryMaterialsBySubcourseId" resultType="com.etd.etdservice.bean.course.CourseMaterial">
+        SELECT a.id, a.video_url
+        FROM
+        <include refid="com.etd.etdservice.dao.CourseMaterialDAO.tb_name"/> a,
+        <include refid="com.etd.etdservice.dao.SubcourseToMaterialDAO.tb_name"/> b
+        WHERE #{subcourseId} = b.`subcourse_id` AND a.`id` = b.`material_id`
+    </select>
+</mapper>

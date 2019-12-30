@@ -28,6 +28,8 @@ public class WebConfiguration implements WebMvcConfigurer{
 		// 图片存放路径
 		registry.addResourceHandler("/images/avatars/**").addResourceLocations("file:/home/webapp/EducationTraining/images/avatars/");
 		registry.addResourceHandler("/images/others/**").addResourceLocations("file:/home/webapp/EducationTraining/images/others/");
+		// 视频存放路径
+		registry.addResourceHandler("/video/**").addResourceLocations("file:/home/webapp/EducationTraining/videos/");
 		WebMvcConfigurer.super.addResourceHandlers(registry);
 	}
 

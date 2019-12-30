@@ -45,7 +45,7 @@ CREATE TABLE students(
   ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
   alter table courses modify `score` double DEFAULT 0 COMMENT '课程总评分';
   alter table courses add `course_num` varchar(64) UNIQUE KEY COMMENT '课程编号';
-  
+  alter table courses modify `pages` varchar(2048) COMMENT '课程目录json字符串';
   CREATE TABLE course_student(
   `id`  int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `course_id`   int(10) UNSIGNED NOT NULL,
@@ -72,6 +72,23 @@ CREATE TABLE students(
   `create_time` datetime NOT NULL COMMENT '注册时间',
   UNIQUE KEY `user_name` (`user_name`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
   
+  CREATE TABLE course_materials(
+  `id`  int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `video_url` varchar(256) COMMENT '课程视频url'
+  ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  
+  CREATE TABLE subcourses(
+  `id`  int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `course_id` int(10) UNSIGNED NOT NULL COMMENT '主课程id',
+  `title` varchar(64) COMMENT '子课程标题',
+  UNIQUE KEY(`course_id`, `title`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  
+  CREATE TABLE subcourse_to_materials(
+  `id`  int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `material_id` int(10) UNSIGNED NOT NULL COMMENT '课程材料id',
+  `subcourse_id` int(10) UNSIGNED NOT NULL COMMENT '子课程id',
+  UNIQUE KEY(`material_id`, `subcourse_id`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
   
