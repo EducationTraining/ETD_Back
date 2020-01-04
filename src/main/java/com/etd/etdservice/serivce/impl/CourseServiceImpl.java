@@ -114,25 +114,30 @@ public class CourseServiceImpl implements CourseService {
 		if (pages == null || pages.equals("")) {
 			return pages;
 		}
-		JSONArray subcourseArray = JSON.parseArray(pages);
-		// 遍历每一个一级子课程
-		for (int i=0; i<subcourseArray.size(); i++) {
-			JSONObject firstSubcourseObj = subcourseArray.getJSONObject(i);
-			// 为每个一级子课程查询子课程信息
-			Integer id = firstSubcourseObj.getInteger("id");
-			Subcourse firstSubcourse = subcourseDAO.queryById(id);
-			firstSubcourseObj.put("title", firstSubcourse.getTitle());
-			// 遍历二级子课程
-			JSONArray secondSubcourses = firstSubcourseObj.getJSONArray("subcourses");
-			for (int j=0; j<secondSubcourses.size(); j++) {
-				// 为每个二级子课程查询子课程信息
-				JSONObject secondSubcourseObj = secondSubcourses.getJSONObject(j);
-				Integer secondId = secondSubcourseObj.getInteger("id");
-				Subcourse secondSubcourse = subcourseDAO.queryById(secondId);
-				secondSubcourseObj.put("title", secondSubcourse.getTitle());
+		try {
+			JSONArray subcourseArray = JSON.parseArray(pages);
+			// 遍历每一个一级子课程
+			for (int i = 0; i < subcourseArray.size(); i++) {
+				JSONObject firstSubcourseObj = subcourseArray.getJSONObject(i);
+				// 为每个一级子课程查询子课程信息
+				Integer id = firstSubcourseObj.getInteger("id");
+				Subcourse firstSubcourse = subcourseDAO.queryById(id);
+				firstSubcourseObj.put("title", firstSubcourse.getTitle());
+				// 遍历二级子课程
+				JSONArray secondSubcourses = firstSubcourseObj.getJSONArray("subcourses");
+				for (int j = 0; j < secondSubcourses.size(); j++) {
+					// 为每个二级子课程查询子课程信息
+					JSONObject secondSubcourseObj = secondSubcourses.getJSONObject(j);
+					Integer secondId = secondSubcourseObj.getInteger("id");
+					Subcourse secondSubcourse = subcourseDAO.queryById(secondId);
+					secondSubcourseObj.put("title", secondSubcourse.getTitle());
+				}
 			}
+			return JSON.toJSONString(subcourseArray);
+		} catch (Exception e) {
+			log.info(e.getMessage());
+			return pages;
 		}
-		return JSON.toJSONString(subcourseArray);
 	}
 
 
