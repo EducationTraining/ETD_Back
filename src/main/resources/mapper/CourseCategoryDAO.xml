@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mabatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etd.etdservice.dao.CourseCategoryDAO">
+    <!-- 表名 -->
+    <sql id="tb_name">etd_db.course_categories</sql>
+    <!--表中所有字段-->
+    <sql id="tb_columns">
+        `id`, `category_id`, `category_name`
+	</sql>
+
+    <select id="queryAllCategoryName" resultType="java.lang.String">
+        SELECT `category_name`
+        FROM <include refid="com.etd.etdservice.dao.CourseCategoryDAO.tb_name" />
+    </select>
+
+    <select id="queryById" resultType="com.etd.etdservice.bean.course.Course">
+        SELECT <include refid="com.etd.etdservice.dao.CourseDAO.tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
+        WHERE #{id} = `id`
+    </select>
+
+    <insert id="addCourseCategory" >
+        INSERT INTO <include refid="com.etd.etdservice.dao.CourseCategoryDAO.tb_name"/>
+        (`category_id`, `category_name`)
+        VALUES
+        (#{categoryId}, #{categoryName})
+    </insert>
+
+    <delete id="deleteCourseCategory">
+        DELETE FROM <include refid="com.etd.etdservice.dao.CourseCategoryDAO.tb_name"/>
+        WHERE `category_id` = #{categoryId}
+    </delete>
+
+    <select id="queryCategoryIdByName">
+        SELECT `category_id`
+        FROM <include refid="com.etd.etdservice.dao.CourseCategoryDAO.tb_name"/>
+        WHERE `category_name` = #{categoryName}
+    </select>
+
+    <update id="updateCategoryName">
+        UPDATE <include refid="com.etd.etdservice.dao.CourseCategoryDAO.tb_name"/>
+        SET `category_name` = #{param2}
+        WHERE `category_id` = #{param1}
+    </update>
+
+    <select id="queryCategoryById" resultType="com.etd.etdservice.bean.course.CourseCategory">
+        SELECT *
+        FROM <include refid="com.etd.etdservice.dao.CourseCategoryDAO.tb_name"/>
+        WHERE `category_id` = #{categoryId}
+    </select>
+</mapper>

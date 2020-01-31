@@ -5,9 +5,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.Course;
+import com.etd.etdservice.bean.course.CourseCategory;
 import com.etd.etdservice.bean.course.Subcourse;
 import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
+import com.etd.etdservice.bean.course.response.ResponseGetCoursesCategories;
 import com.etd.etdservice.bean.users.Admin;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetAdmin;
@@ -38,6 +40,8 @@ public class AdminServiceImpl implements AdminService {
     private TeacherDAO teacherDAO;
     @Autowired
     private CourseStudentDAO courseStudentDAO;
+    @Autowired
+    private CourseCategoryDAO courseCategoryDAO;
 
     /**
      * 管理员获取所有课程
@@ -175,6 +179,100 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
+    @Override
+    public BaseResponse updateCourseCategory(Integer categoryId, String categoryName, String sessionKey) {
+        BaseResponse baseResponse = new BaseResponse();
+        // 如果session为null，返回失败
+        if (sessionKey == null) {
+            baseResponse.setFailResponse(BaseResponse.NULL_SESSION_KEY);
+            return baseResponse;
+        }
+        // 如果该sesionKey不存在，返回失败：没有管理员权限
+        Admin resAdmin = adminDAO.queryBySessionKey(sessionKey);
+        if (resAdmin == null) {
+            baseResponse.setFailResponse(BaseResponse.NULL_ADMIN);
+            return baseResponse;
+        }
+
+        // 修改课程类别
+        boolean status = courseCategoryDAO.updateCategoryName(categoryId, categoryName);
+        if (status) {
+            //修改成功，返回成功
+            baseResponse.setSuccess(true);
+            baseResponse.setErrMsg("");
+            return baseResponse;
+        }
+        //修改失败，返回失败
+        baseResponse.setSuccess(false);
+        baseResponse.setErrMsg("error !");
+        return baseResponse;
+    }
+
+    @Override
+    public ResponseGetCoursesCategories getAllCoursesCategories(String sessionKey) {
+        // 如果sessionKey为null，则直接返回失败
+        if (sessionKey == null) {
+            return new ResponseGetCoursesCategories(false, "sessionKey error", null);
+        }
+        // 如果该sessionKey不存在，返回失败：没有管理员权限
+        Admin resAdmin = adminDAO.queryBySessionKey(sessionKey);
+        if (resAdmin == null) {
+            return new ResponseGetCoursesCategories(false, "Admin not found !", null);
+        }
+        // 获取所有课程类别
+        List<String> categoriesNames = courseCategoryDAO.queryAllCategoryName();
+        return new ResponseGetCoursesCategories(true, "", categoriesNames);
+    }
+
+    @Override
+    public BaseResponse addCourseCategory(int categoryId, String categoryName, String sessionKey) {
+        BaseResponse baseResponse = new BaseResponse();
+        // 如果session为null，返回失败
+        if (sessionKey == null) {
+            baseResponse.setFailResponse(BaseResponse.NULL_SESSION_KEY);
+            return baseResponse;
+        }
+        // 如果该sesionKey不存在，返回失败：没有管理员权限
+        Admin resAdmin = adminDAO.queryBySessionKey(sessionKey);
+        if (resAdmin == null) {
+            baseResponse.setFailResponse(BaseResponse.NULL_ADMIN);
+            return baseResponse;
+        }
+        // 增加课程类别
+        CourseCategory courseCategory = new CourseCategory();
+        courseCategory.setCategoryId(categoryId);
+        courseCategory.setCategoryName(categoryName);
+        boolean status = courseCategoryDAO.addCourseCategory(courseCategory);
+        if(status) {
+            return new BaseResponse(true, "");
+        }else {
+            return new BaseResponse(false, "addCourseCategory failed");
+        }
+    }
+
+    @Override
+    public BaseResponse deleteCourseCategory(int categoryId, String sessionKey) {
+        BaseResponse baseResponse = new BaseResponse();
+        // 如果session为null，返回失败
+        if (sessionKey == null) {
+            baseResponse.setFailResponse(BaseResponse.NULL_SESSION_KEY);
+            return baseResponse;
+        }
+        // 如果该sesionKey不存在，返回失败：没有管理员权限
+        Admin resAdmin = adminDAO.queryBySessionKey(sessionKey);
+        if (resAdmin == null) {
+            baseResponse.setFailResponse(BaseResponse.NULL_ADMIN);
+            return baseResponse;
+        }
+        // 删除课程类别
+        boolean status = courseCategoryDAO.deleteCourseCategory(categoryId);
+        if(status) {
+            return new BaseResponse(true, "");
+        }else {
+            return new BaseResponse(false, "deleteCourseCategory failed");
+        }
+    }
+
     /**
      * 将只含id subcourse目录json字符串处理为含完整信息的目录json字符串
      * @param pages
@@ -201,4 +299,5 @@ public class AdminServiceImpl implements AdminService {
         }
         return JSON.toJSONString(subcourseArray);
     }
+
 }

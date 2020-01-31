@@ -1,11 +1,16 @@
 package com.etd.etdservice.service;
 
 
+import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.Course;
+import com.etd.etdservice.bean.course.CourseCategory;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
+import com.etd.etdservice.bean.course.response.ResponseGetCoursesCategories;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetAdmin;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
+import com.etd.etdservice.dao.CourseCategoryDAO;
+import com.etd.etdservice.dao.CourseCategoryDAOTest;
 import com.etd.etdservice.dao.CourseDAO;
 import com.etd.etdservice.dao.TeacherDAO;
 import com.etd.etdservice.serivce.AdminService;
@@ -36,6 +41,9 @@ public class AdminServiceTest {
 
     @Autowired
     private TeacherDAO teacherDAO;
+
+    @Autowired
+    private CourseCategoryDAO courseCategoryDAO;
 
     @Test
     public void testRegister() {
@@ -168,4 +176,66 @@ public class AdminServiceTest {
         assertTrue(adminService.updateCourseStatus(course.getId(),2, sessionKeyOfAdmin).isSuccess());
         assertTrue(adminService.updateCourseStatus(course.getId(),1, sessionKeyOfAdmin).isSuccess());
     }
+
+    @Test
+    public void updateCourseCategoryTest() {
+        // 插入一条管理员信息
+        String adminName = StringUtil.generateRandomString("admin");
+        String adminPassWord = StringUtil.generateRandomString("password");
+        String sessionKeyOfAdmin = adminService.register(adminName, adminPassWord).getSessionKey();
+        // 增加一个课程类别
+        CourseCategory courseCategory = CourseCategoryDAOTest.mockCourseCategory();
+        int categoryId = courseCategory.getCategoryId();
+        String categoryName = courseCategory.getCategoryName();
+        adminService.addCourseCategory(categoryId, categoryName, sessionKeyOfAdmin);
+        // 修改刚才增加的课程类别
+        BaseResponse updateCategory = adminService.updateCourseCategory(categoryId, "updateCategory", sessionKeyOfAdmin);
+        assertEquals("updateCategory", courseCategoryDAO.queryCategoryById(courseCategory.getCategoryId()).getCategoryName());
+        assertEquals("", updateCategory.getErrMsg());
+    }
+
+    @Test
+    public void getAllCoursesCategoriesTest() {
+        // 插入一条管理员信息
+        String adminName = StringUtil.generateRandomString("admin");
+        String adminPassWord = StringUtil.generateRandomString("password");
+        String sessionKeyOfAdmin = adminService.register(adminName, adminPassWord).getSessionKey();
+        // 获取所有课程类别
+        ResponseGetCoursesCategories allCoursesCategories = adminService.getAllCoursesCategories(sessionKeyOfAdmin);
+        for (String category : allCoursesCategories.getCategoriesList()) {
+            log.info(category);
+        }
+        assertEquals("", allCoursesCategories.getErrMsg());
+    }
+
+    @Test
+    public void addCourseCategory() {
+        // 插入一条管理员信息
+        String adminName = StringUtil.generateRandomString("admin");
+        String adminPassWord = StringUtil.generateRandomString("password");
+        String sessionKeyOfAdmin = adminService.register(adminName, adminPassWord).getSessionKey();
+        // 增加一个课程类别
+        CourseCategory courseCategory = CourseCategoryDAOTest.mockCourseCategory();
+        int categoryId = courseCategory.getCategoryId();
+        String categoryName = courseCategory.getCategoryName();
+        BaseResponse baseResponse = adminService.addCourseCategory(categoryId, categoryName, sessionKeyOfAdmin);
+        assertEquals("", baseResponse.getErrMsg());
+    }
+
+    @Test
+    public void deleteCourseCategory() {
+        // 插入一条管理员信息
+        String adminName = StringUtil.generateRandomString("admin");
+        String adminPassWord = StringUtil.generateRandomString("password");
+        String sessionKeyOfAdmin = adminService.register(adminName, adminPassWord).getSessionKey();
+        // 增加一个课程类别
+        CourseCategory courseCategory = CourseCategoryDAOTest.mockCourseCategory();
+        int categoryId = courseCategory.getCategoryId();
+        String categoryName = courseCategory.getCategoryName();
+        adminService.addCourseCategory(categoryId, categoryName, sessionKeyOfAdmin);
+        // 删除刚才新增的课程类别
+        BaseResponse baseResponse = adminService.deleteCourseCategory(categoryId, sessionKeyOfAdmin);
+        assertEquals("", baseResponse.getErrMsg());
+    }
+
 }

@@ -24,6 +24,7 @@ public class ResponseCourse {
 	private String description;
 	private String note;
 	private String avatarUrl;
+	private Integer categoryId;
 
 	/**
 	 *

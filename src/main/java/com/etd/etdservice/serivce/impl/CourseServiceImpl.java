@@ -196,23 +196,23 @@ public class CourseServiceImpl implements CourseService {
 	@Override
 	public BaseResponse updateCourseInfo(RequestUpdateCourse request) {
 		String sessionKey = request.getSessionKey();
-		if(sessionKey == null){
+		if(sessionKey == null) {
 			return new BaseResponse(false, "param error");
 		}
 		Course course = courseDAO.queryById(request.getCourseId());
-		if(course == null){
+		if(course == null) {
 			return new BaseResponse(false, "invalid courseId");
 		}
 		Teacher teacher = teacherDAO.queryBySessionKey(sessionKey);
-		if(teacher == null){
+		if(teacher == null) {
 			return new BaseResponse(false, "invalid sessionKey");
 		}
-		if(teacher.getId() != course.getTeacherId()){
+		if(teacher.getId() != course.getTeacherId()) {
 			return new BaseResponse(false, "have no permission to update courseInfo");
 		}
 		course.setName(request.getName());
 		course.setPages(request.getPages());
-		if(request.getStartTime() != null){
+		if(request.getStartTime() != null) {
 			course.setStartTime(new Date(request.getStartTime()));
 		}else {
 			course.setStartTime(null);
@@ -222,10 +222,10 @@ public class CourseServiceImpl implements CourseService {
 		course.setDescription(request.getDescription());
 		course.setNote(request.getNote());
 		course.setAvatarUrl(request.getAvatarUrl());
-		if(courseDAO.update(course)){
+		if(courseDAO.update(course)) {
 			log.info("teacher (id: " + teacher.getId() + ") update course (id: " + course.getId() + ") successfully.");
 			return new BaseResponse(true, "courseInfo update");
-		}else{
+		} else {
 			log.warn("teacher (id: " + teacher.getId() + ") try to update course(id: " + course.getId() + ") but fail!");
 			return new BaseResponse(false, "update courseInfo failed");
 		}
@@ -257,7 +257,7 @@ public class CourseServiceImpl implements CourseService {
 		if (courseId == null || sessionKey == null) {
 			return new BaseResponse(false, "param error");
 		}
-		//根据学生sessionKey获取学生id
+		// 根据学生sessionKey获取学生id
 		Student student = studentDAO.queryBySessionKey(sessionKey);
 		Integer studentId = student.getId();
 		Date createDate = new Date();
@@ -265,11 +265,11 @@ public class CourseServiceImpl implements CourseService {
 		CourseStudent courseStudent = new CourseStudent(0, courseId, studentId, createDate);
 
 		boolean status = courseStudentDAO.attendCourse(courseStudent);
-		if(status){
-			//选课成功
+		if(status) {
+			// 选课成功
 			return new BaseResponse(true, "");
-		}else{
-			//选课失败
+		} else {
+			// 选课失败
 			return new BaseResponse(false, "attendCourse failed");
 		}
 

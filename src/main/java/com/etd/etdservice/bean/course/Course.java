@@ -23,4 +23,5 @@ public class Course {
 	private Date createTime;
 	private String note;
 	private String avatarUrl;
+	private int categoryId;
 }

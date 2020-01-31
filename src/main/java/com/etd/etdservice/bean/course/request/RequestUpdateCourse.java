@@ -19,4 +19,5 @@ public class RequestUpdateCourse {
 	private String description;
 	private String note;
 	private String avatarUrl;
+	private Integer categoryId;
 }

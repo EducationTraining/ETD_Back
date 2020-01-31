@@ -4,6 +4,7 @@ package com.etd.etdservice.web;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
+import com.etd.etdservice.bean.course.response.ResponseGetCoursesCategories;
 import com.etd.etdservice.bean.users.requests.RequestRegister;
 import com.etd.etdservice.bean.users.response.ResponseGetAdmin;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
@@ -43,8 +44,6 @@ public class AdminController {
         return service.getAllCourses(sessionKey);
     }
 
-
-
     @RequestMapping(value = "/update/course", method = RequestMethod.POST)
     public BaseResponse updateCourse(@RequestBody RequestUpdateCourse requestUpdateCourse) {
         Integer courseId = requestUpdateCourse.getCourseId();
@@ -53,4 +52,27 @@ public class AdminController {
         return service.updateCourseStatus(courseId, status, sessionKey);
     }
 
+    // 修改课程类别
+    @RequestMapping(value = "/session-key/{sessionKey}/updateCourseCategory", method = RequestMethod.POST)
+    public BaseResponse updateCourseCategory(@PathVariable String sessionKey, @RequestParam("categoryId") Integer categoryId, @RequestParam("categoryName") String categoryName ){
+        return service.updateCourseCategory(categoryId, categoryName, sessionKey);
+    }
+
+    // 查询所有课程类别
+    @RequestMapping(value = "/session-key/{sessionKey}/admin/getCoursesCategories", method = RequestMethod.POST)
+    public ResponseGetCoursesCategories getAllCoursesCategories(@PathVariable String sessionKey) {
+        return service.getAllCoursesCategories(sessionKey);
+    }
+
+    // 增加课程类别
+    @RequestMapping(value = "/session-key/{sessionKey}/admin/addCourseCategory", method = RequestMethod.POST)
+    public BaseResponse addCourseCategory(@PathVariable String sessionKey, @RequestParam("categoryId") int categoryId, @RequestParam("categoryName") String categoryName){
+        return service.addCourseCategory(categoryId, categoryName, sessionKey);
+    }
+
+    // 删除课程类别
+    @RequestMapping(value = "/session-key/{sessionKey}/admin/deleteCourseCategory", method = RequestMethod.POST)
+    public BaseResponse deleteCourseCategory(@PathVariable String sessionKey, @RequestParam("categoryId") int categoryId){
+        return service.deleteCourseCategory(categoryId, sessionKey);
+    }
 }
