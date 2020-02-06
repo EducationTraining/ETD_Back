@@ -9,8 +9,10 @@ import com.etd.etdservice.bean.course.Subcourse;
 import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.users.Admin;
+import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetAdmin;
+import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseGetTeacher;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
 import com.etd.etdservice.dao.*;
@@ -38,6 +40,8 @@ public class AdminServiceImpl implements AdminService {
     private TeacherDAO teacherDAO;
     @Autowired
     private CourseStudentDAO courseStudentDAO;
+    @Autowired
+    private StudentDAO studentDAO;
 
     /**
      * 管理员获取所有课程
@@ -173,6 +177,34 @@ public class AdminServiceImpl implements AdminService {
         else {
             return new ResponseRegister(false, "invalid password", null);
         }
+    }
+
+    @Override
+    public BaseResponse updateStudentStatus(Integer studentId, boolean status, String sessionKey) {
+        BaseResponse baseResponse = new BaseResponse();
+        // 如果session为null，返回失败
+        if (sessionKey == null) {
+            baseResponse.setFailResponse(BaseResponse.NULL_SESSION_KEY);
+            return baseResponse;
+        }
+        // 如果该sesionKey不存在，返回失败：没有管理员权限
+        Admin resAdmin = adminDAO.queryBySessionKey(sessionKey);
+        if (resAdmin == null) {
+            baseResponse.setFailResponse(BaseResponse.NULL_ADMIN);
+            return baseResponse;
+        }
+        // 获取该学生，并修改状态
+        Student student = studentDAO.queryById(studentId);
+        student.setValid(status);
+        if (studentDAO.update(student)) {
+            //修改成功，返回成功
+            baseResponse.setSuccess(true);
+            return baseResponse;
+        }
+        //修改失败，返回失败
+        baseResponse.setSuccess(false);
+        baseResponse.setErrMsg("error !");
+        return baseResponse;
     }
 
     /**

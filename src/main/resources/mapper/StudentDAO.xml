@@ -20,6 +20,7 @@
             <if test="email!=null">`email`=#{email},</if>
             <if test="avatarUrl!=null">`avatar_url`=#{avatarUrl},</if>
             <if test="sex!=null">`sex`=#{sex}</if>
+            <if test="valid!=null">`valid`=#{valid}</if>
         </set>
     </sql>
 
@@ -49,9 +50,11 @@
 
     <insert id="create" parameterType="com.etd.etdservice.bean.users.Student">
         INSERT INTO <include refid="com.etd.etdservice.dao.StudentDAO.tb_name" />
-        (`user_name`, `session_key`, `create_time`)
+        <!-- (`user_name`, `session_key`, `real_name`, `phone`, `email`, `create_time`, `avatar_url`, `sex`, `valid`) -->
+        (`user_name`, `session_key`,  `create_time`)
         VALUES
         (#{userName}, #{sessionKey}, #{createTime})
+        <!--(#{userName}, #{sessionKey}, #{realName}, #{phone}, #{email}, #{createTime}, #{avatarUrl}, #{sex}, #{valid}) -->
     </insert>
 
     <select id="queryLatestTwoCourses" resultType="com.etd.etdservice.bean.course.Course">
