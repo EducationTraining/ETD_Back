@@ -44,4 +44,13 @@ public interface AdminService {
 	 * @return
 	 */
 	ResponseRegister getLoginInfo(String userName, String password);
+
+	/**
+	 * 修改学生的账号（封禁/解封学生的账号）
+	 * @param studentId
+	 * @param status
+	 * @param sessionKey
+	 * @return
+	 */
+	BaseResponse updateStudentStatus(Integer studentId, boolean status, String sessionKey);
 }
