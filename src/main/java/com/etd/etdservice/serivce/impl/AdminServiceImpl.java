@@ -213,24 +213,32 @@ public class AdminServiceImpl implements AdminService {
      * @return
      */
     private String processOriginalPages(String pages) {
-        JSONArray subcourseArray = JSON.parseArray(pages);
-        // 遍历每一个一级子课程
-        for (int i=0; i<subcourseArray.size(); i++) {
-            JSONObject firstSubcourseObj = subcourseArray.getJSONObject(i);
-            // 为每个一级子课程查询子课程信息
-            Integer id = firstSubcourseObj.getInteger("id");
-            Subcourse firstSubcourse = subcourseDAO.queryById(id);
-            firstSubcourseObj.put("title", firstSubcourse.getTitle());
-            // 遍历二级子课程
-            JSONArray secondSubcourses = firstSubcourseObj.getJSONArray("subcourses");
-            for (int j=0; j<secondSubcourses.size(); j++) {
-                // 为每个二级子课程查询子课程信息
-                JSONObject secondSubcourseObj = subcourseArray.getJSONObject(j);
-                Integer secondId = secondSubcourseObj.getInteger("id");
-                Subcourse secondSubcourse = subcourseDAO.queryById(secondId);
-                secondSubcourseObj.put("title", secondSubcourse.getTitle());
-            }
+        if (pages == null || pages.equals("")) {
+            return pages;
         }
-        return JSON.toJSONString(subcourseArray);
+        try {
+            JSONArray subcourseArray = JSON.parseArray(pages);
+            // 遍历每一个一级子课程
+            for (int i=0; i<subcourseArray.size(); i++) {
+                JSONObject firstSubcourseObj = subcourseArray.getJSONObject(i);
+                // 为每个一级子课程查询子课程信息
+                Integer id = firstSubcourseObj.getInteger("id");
+                Subcourse firstSubcourse = subcourseDAO.queryById(id);
+                firstSubcourseObj.put("title", firstSubcourse.getTitle());
+                // 遍历二级子课程
+                JSONArray secondSubcourses = firstSubcourseObj.getJSONArray("subcourses");
+                for (int j=0; j<secondSubcourses.size(); j++) {
+                    // 为每个二级子课程查询子课程信息
+                    JSONObject secondSubcourseObj = subcourseArray.getJSONObject(j);
+                    Integer secondId = secondSubcourseObj.getInteger("id");
+                    Subcourse secondSubcourse = subcourseDAO.queryById(secondId);
+                    secondSubcourseObj.put("title", secondSubcourse.getTitle());
+                }
+            }
+            return JSON.toJSONString(subcourseArray);
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            return pages;
+        }
     }
 }

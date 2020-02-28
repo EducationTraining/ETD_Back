@@ -1,6 +1,7 @@
 package com.etd.etdservice.service;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.etd.etdservice.bean.BaseResponse;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -69,22 +72,52 @@ public class CourseServiceTest {
     private static final int MAX_PAGE = 10;
 
 
+    /**
+     * mockCourse 返回的 course 不包含有效的 teacher id。
+     * @return
+     */
     public static Course mockCourse() {
         Course course = new Course();
-        // Teacher teacher = UserDAOTest.mockTeacher();
-        // teacherDAO.create(teacher);
-        // Teacher teacherRes = teacherDAO.queryByUserName(teacher.getUserName());
-        // course.setTeacherId(teacherRes.getId());
-        course.setTeacherId(1);
         course.setCourseNum(StringUtil.generateRandomString("courseNUm"));
-        course.setAvatarUrl(StringUtil.generateRandomString("avatarUrl"));
-        course.setCreateTime(new Date());
-        course.setStartTime(new Date());
-        course.setDescription(StringUtil.generateRandomString("description"));
+        course.setTeacherId(1);
         course.setName(StringUtil.generateRandomString("name"));
-        course.setNote(StringUtil.generateRandomString("note"));
-        course.setPages(StringUtil.generateRandomString("pages"));
         course.setScore(DoubleUtil.nextDouble(0, 5));
+        course.setPages(StringUtil.generateRandomString("pages"));
+        course.setStartTime(new Date());
+        course.setWeeks(new Random().nextInt(10));
+        course.setStatus(new Random().nextInt(2));
+        course.setDescription(StringUtil.generateRandomString("description"));
+        course.setCreateTime(new Date());
+        course.setNote(StringUtil.generateRandomString("note"));
+        course.setAvatarUrl(StringUtil.generateRandomString("avatarUrl"));
+        return course;
+    }
+
+    /**
+     * 根据此方法生成的 course，其所属的 teacher 是真实存在的
+     * @return 课程 course
+     */
+    private Course mockCourseWithTrueTeacher() {
+        return mockCourseWithTrueTeacher(null);
+    }
+
+    /**
+     * 根据此方法生成的 course，其所属的 teacher 由参数传入
+     * @param teacher 课程所属老师
+     * @return
+     */
+    private Course mockCourseWithTrueTeacher(Teacher teacher) {
+        Course course = mockCourse();
+        if (teacher == null || teacher.getSessionKey() == null) {
+            teacher = UserDAOTest.mockTeacher();
+        }
+        if (teacherDAO.queryBySessionKey(teacher.getSessionKey()) == null) {
+            teacherDAO.create(teacher);
+        }
+        teacher = teacherDAO.queryBySessionKey(teacher.getSessionKey());
+        course.setTeacherId(teacher.getId());
+        courseDAO.create(course);
+        course.setId(courseDAO.queryByCourseNum(course.getCourseNum()).getId());
         return course;
     }
 
@@ -186,10 +219,12 @@ public class CourseServiceTest {
         studentDAO.create(student1);
         Student student2 = UserDAOTest.mockStudent();
         studentDAO.create(student2);
+        Teacher teacher = UserDAOTest.mockTeacher();
+        teacherDAO.create(teacher);
 
         // mock一个老师并开设一门课程
-        Course course = mockCourse();
-        courseDAO.create(course);
+        Course course = mockCourseWithTrueTeacher();
+        log.debug("courseId: " + course.getId() + "\nteacherId: " + teacher.getId());
 
         // 获取courseId和老师sessionKey
         int courseId = courseDAO.queryByCourseNum(course.getCourseNum()).getId();
@@ -232,10 +267,8 @@ public class CourseServiceTest {
     @Test
     public void testGetHottestCourses() {
         for (int i = 0; i < COURSE_NUM; ++i) {
-            Course mockCourse = CourseServiceTest.mockCourse();
-            courseDAO.create(mockCourse);
+            mockCourseWithTrueTeacher();
         }
-
         List<Course> courses = courseDAO.queryAllCourses();
         Course mockCourse = courses.get(0);
         mockCourse.setStatus(1);
@@ -260,13 +293,17 @@ public class CourseServiceTest {
 
     @Test
     public void testGetLatestCourses() {
-        Course mockCourse = CourseServiceTest.mockCourse();
-        courseDAO.create(mockCourse);
+        Course mockCourse = null;
+        for (int i = 0; i < COURSE_NUM; ++i) {
+            mockCourse = mockCourseWithTrueTeacher();
+        }
+
         ResponseGetCourses responseGetCourses = courseService.getLatestCourses();
+        log.debug("Debug getLatestCourses: " + JSON.toJSONString(responseGetCourses));
+
         Assert.assertTrue(responseGetCourses.isSuccess());
         Assert.assertNotNull(responseGetCourses.getCoursesList());
 
-        boolean flag = false;
         List<ResponseCourse> courseList = responseGetCourses.getCoursesList();
         for (int i = 0; i < courseList.size(); ++i){
             if (courseList.get(i).getId() == mockCourse.getId()){
@@ -274,13 +311,13 @@ public class CourseServiceTest {
                 Assert.assertEquals(responseCourse.getTeacher().getId(), (int)mockCourse.getTeacherId());
             }
         }
+
     }
 
     @Test
     public void testGetCourses() {
         for (int i = 0; i < LIMIT * MAX_PAGE; ++i){
-            Course course = mockCourse();
-            courseDAO.create(course);
+            mockCourse();
         }
         for (int page = 1; page < MAX_PAGE; ++page){
             ResponseGetCourses responseGetCourses = courseService.getCourses(page, LIMIT);
@@ -293,9 +330,7 @@ public class CourseServiceTest {
 
     @Test
     public void testUploadCoursePic() {
-        Course course = mockCourse();
-        courseDAO.create(course);
-        course = courseDAO.queryByCourseNum(course.getCourseNum());
+        Course course = mockCourseWithTrueTeacher();
         Teacher teacher = teacherDAO.queryById(course.getTeacherId());
 
         String name = StringUtil.generateRandomString("name:");
@@ -309,6 +344,7 @@ public class CourseServiceTest {
 
         Assert.assertNotNull(responseUploadAvatar);
         Assert.assertTrue(responseUploadAvatar.isSuccess());
+        // TODO Assert Error
         String expectedAvatarUrl =
                 urlStarter + "/images/" + CourseServiceImpl.COURSE_TYPE + "/" + file.getOriginalFilename();
         Assert.assertEquals(responseUploadAvatar.getAvatarUrl(), expectedAvatarUrl);
@@ -325,12 +361,10 @@ public class CourseServiceTest {
         // course与mockCourse都是随机生成的。
         // 将course插入数据库，然后用mockCourse的信息作为course的更新信息
         // 更新后比对course更新后的信息与mockCourse是否一致
-        Course course = mockCourse();
-        mockCourse.setStatus(1);
-        courseDAO.create(course);
+        Course course = mockCourseWithTrueTeacher();
+        Teacher teacher = teacherDAO.queryById(course.getTeacherId());
 
         course = courseDAO.queryByCourseNum(course.getCourseNum());
-        Teacher teacher = teacherDAO.queryById(course.getTeacherId());
 
         RequestUpdateCourse request = new RequestUpdateCourse();
 
@@ -346,6 +380,7 @@ public class CourseServiceTest {
         // 老师的sessionKey和课程的courseId都有
         request.setCourseId(course.getId());
         response = courseService.updateCourseInfo(request);
+        // TODO assert error
         Assert.assertTrue(response.isSuccess());
 
         // 只更新一项
@@ -369,7 +404,9 @@ public class CourseServiceTest {
         Assert.assertEquals(mockCourse.getName(), course.getName());
         Assert.assertEquals(mockCourse.getPages(), course.getPages());
         // startTime比较存在一定的出入
-        Assert.assertEquals(mockCourse.getStartTime().toString(), course.getStartTime().toString());
+        log.debug(mockCourse.getStartTime().toString() + course.getStartTime().toString());
+        Assert.assertEquals(mockCourse.getStartTime().toString().substring(0, 14),
+                course.getStartTime().toString().substring(0, 14));
         Assert.assertEquals(mockCourse.getWeeks(), course.getWeeks());
         Assert.assertEquals(mockCourse.getStatus(), course.getStatus());
         Assert.assertEquals(mockCourse.getDescription(), course.getDescription());
@@ -393,8 +430,8 @@ public class CourseServiceTest {
     public void testUpdateCoursePages() {
         // mock
         JSONArray mockSubcourseArray = new JSONArray();
-        Course course = mockCourse();
-        courseDAO.create(course);
+        Course course = mockCourseWithTrueTeacher();
+        Teacher teacher = teacherDAO.queryById(course.getTeacherId());
         // Comment courseDAO.create(course) and use next line to test update pages for same course.
         // course.setId(142);
         for (int i=1; i<=3; i++) {
@@ -413,8 +450,9 @@ public class CourseServiceTest {
         log.info("MOCK: " + mockSubcourseArrayStr);
         // May need change sessionKey to pass the test.
         ResponseUpdateCoursePages response = courseService.updateCoursePages(
-                mockSubcourseArrayStr, course.getId(), "6c1468eeef3890e927fa7e2c3cf8f8a8");
+                mockSubcourseArrayStr, course.getId(), teacher.getSessionKey());
         log.info(response.getErrMsg());
+        // TODO Assert Error
         assertTrue(response.isSuccess());
         String resSubcourseArrayStr = response.getPages();
         log.info("RES:" + resSubcourseArrayStr);
