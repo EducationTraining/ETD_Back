@@ -1,15 +1,9 @@
 package com.etd.etdservice.serivce;
 
 import com.etd.etdservice.bean.BaseResponse;
-import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
-import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
-import com.etd.etdservice.bean.course.request.RequestUploadCourse;
-import com.etd.etdservice.bean.course.response.ResponseCourse;
-import com.etd.etdservice.bean.course.response.ResponseGetCourses;
-import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
-import com.etd.etdservice.bean.course.response.ResponseUpdateCoursePages;
-import com.etd.etdservice.bean.course.response.ResponseUploadMaterial;
-import com.etd.etdservice.bean.course.response.ResponseUploadCourse;
+import com.etd.etdservice.bean.course.CourseNote;
+import com.etd.etdservice.bean.course.request.*;
+import com.etd.etdservice.bean.course.response.*;
 import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import org.springframework.web.multipart.MultipartFile;
@@ -128,4 +122,33 @@ public interface CourseService {
 	 * @return
 	 */
 	ResponseUpdateCoursePages updateCoursePages(String pages, Integer courseId, String sessionKey);
+
+	/**
+	 * 发布课程公告
+	 * @param request
+	 * @return
+	 */
+	BaseResponse publishCourseNote(RequestPublishCourseNote request);
+
+	/**
+	 * 更新课程公告
+	 * @param request
+	 * @return
+	 */
+	BaseResponse updateCourseNote(RequestUpdateCourseNote request);
+
+	/**
+	 * 返回课程的所有符合特定类型的公告
+	 * @param courseId
+	 * @param type
+	 * @return
+	 */
+	ResponseCourseNotes getNotesWithSpecificType(Integer courseId, Integer type);
+
+	/**
+	 * 返回该课程的所有公告
+	 * @param courseId
+	 * @return
+	 */
+	ResponseCourseNotes getNotes(Integer courseId);
 }

@@ -6,13 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.CourseStudent;
 import com.etd.etdservice.bean.CourseStudentRemark;
-import com.etd.etdservice.bean.course.Course;
-import com.etd.etdservice.bean.course.CourseMaterial;
-import com.etd.etdservice.bean.course.Subcourse;
-import com.etd.etdservice.bean.course.SubcourseToMaterial;
-import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
-import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
-import com.etd.etdservice.bean.course.request.RequestUploadCourse;
+import com.etd.etdservice.bean.course.*;
+import com.etd.etdservice.bean.course.request.*;
 import com.etd.etdservice.bean.course.response.*;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
@@ -54,6 +49,9 @@ public class CourseServiceImpl implements CourseService {
 
 	@Autowired
 	private SubcourseDAO subcourseDAO;
+
+	@Autowired
+	private CourseNoteDAO courseNoteDAO;
 
 	private static TeacherDAO teacherDAO;
 
@@ -526,6 +524,85 @@ public class CourseServiceImpl implements CourseService {
 		} catch (Exception e) {
 			return new ResponseUpdateCoursePages(false, e.getMessage(), "");
 		}
+	}
+
+	@Override
+	public BaseResponse publishCourseNote(RequestPublishCourseNote request) {
+		if (request.sessionKey == null || request.courseId == null) {
+			return new BaseResponse(false, "null parameter");
+		}
+		Teacher teacher = teacherDAO.queryBySessionKey(request.sessionKey);
+		if (teacher == null) {
+			return new BaseResponse(false, "invalid sessionKey");
+		}
+		Course course = courseDAO.queryById(request.courseId);
+		if (course == null) {
+			return new BaseResponse(false, "invalid courseId");
+		}
+		if (request.type == null || request.note == null || request.publishTime == null) {
+			return new BaseResponse(false, "CourseNote's has invalid null parameter.");
+		}
+		CourseNote courseNote = new CourseNote();
+		courseNote.setNote(request.note);
+		courseNote.setCourseId(request.getCourseId());
+		courseNote.setType(request.type);
+		courseNote.setCreateTime(new Date());
+		courseNote.setPublishTime(new Date(request.publishTime));
+		if (request.type == CourseNote.TYPE_BULLETIN) {
+			// 将所属课程的最新公告更新
+			course.setNote(request.note);
+			courseDAO.update(course);
+		}
+		if (courseNoteDAO.publishNote(courseNote)) {
+			return new BaseResponse(true, "publish note success");
+		} else {
+			return new BaseResponse(false, "can not publish note");
+		}
+	}
+
+	@Override
+	public BaseResponse updateCourseNote(RequestUpdateCourseNote request) {
+		if (request.sessionKey == null) {
+			return new BaseResponse(false, "null parameter");
+		}
+		Teacher teacher = teacherDAO.queryBySessionKey(request.sessionKey);
+		if (teacher == null) {
+			return new BaseResponse(false, "invalid sessionKey");
+		}
+		CourseNote courseNote = new CourseNote();
+		courseNote.setId(request.courseNoteId);
+		courseNote.setNote(request.note);
+		courseNote.setType(request.type);
+		courseNote.setPublishTime(new Date(request.publishTime));
+		if (courseNoteDAO.updateNote(courseNote)) {
+			return new BaseResponse(true, "update note success");
+		} else {
+			return new BaseResponse(false, "can not update note");
+		}
+	}
+
+	@Override
+	public ResponseCourseNotes getNotesWithSpecificType(Integer courseId, Integer type) {
+		if (courseId == null || type == null) {
+			return new ResponseCourseNotes(false, "null parameter", null);
+		}
+		List<CourseNote> notes = courseNoteDAO.getAllNotesWithSpecificType(courseId, type);
+		if (notes.size() == 0) {
+			return new ResponseCourseNotes(false, "can not find any note", null);
+		}
+		return new ResponseCourseNotes(true, "success", notes);
+	}
+
+	@Override
+	public ResponseCourseNotes getNotes(Integer courseId) {
+		if (courseId == null) {
+			return new ResponseCourseNotes(false, "null parameter", null);
+		}
+		List<CourseNote> notes = courseNoteDAO.getAllNotes(courseId);
+		if (notes.size() == 0) {
+			return new ResponseCourseNotes(false, "can not find any note", null);
+		}
+		return new ResponseCourseNotes(true, "success", notes);
 	}
 
 	private Subcourse getOrCreateSubcourseByTitleAndCourseId(String title, int courseId) {

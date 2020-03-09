@@ -6,12 +6,12 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.Course;
+import com.etd.etdservice.bean.course.CourseNote;
+import com.etd.etdservice.bean.course.request.RequestPublishCourseNote;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
-import com.etd.etdservice.bean.course.response.ResponseCourse;
-import com.etd.etdservice.bean.course.response.ResponseGetCourses;
-import com.etd.etdservice.bean.course.response.ResponseIsAttendCourse;
-import com.etd.etdservice.bean.course.response.ResponseUpdateCoursePages;
+import com.etd.etdservice.bean.course.request.RequestUpdateCourseNote;
+import com.etd.etdservice.bean.course.response.*;
 import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetStudents;
@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -58,6 +57,9 @@ public class CourseServiceTest {
 
     @Autowired
     private TeacherDAO teacherDAO;
+
+    @Autowired
+    private CourseNoteDAO courseNoteDAO;
 
     @Value("${image_root_path}")
     private String imageRootPath;
@@ -117,7 +119,6 @@ public class CourseServiceTest {
         teacher = teacherDAO.queryBySessionKey(teacher.getSessionKey());
         course.setTeacherId(teacher.getId());
         courseDAO.create(course);
-        course.setId(courseDAO.queryByCourseNum(course.getCourseNum()).getId());
         return course;
     }
 
@@ -344,7 +345,6 @@ public class CourseServiceTest {
 
         Assert.assertNotNull(responseUploadAvatar);
         Assert.assertTrue(responseUploadAvatar.isSuccess());
-        // TODO Assert Error
         String expectedAvatarUrl =
                 urlStarter + "/images/" + CourseServiceImpl.COURSE_TYPE + "/" + file.getOriginalFilename();
         Assert.assertEquals(responseUploadAvatar.getAvatarUrl(), expectedAvatarUrl);
@@ -380,7 +380,6 @@ public class CourseServiceTest {
         // 老师的sessionKey和课程的courseId都有
         request.setCourseId(course.getId());
         response = courseService.updateCourseInfo(request);
-        // TODO assert error
         Assert.assertTrue(response.isSuccess());
 
         // 只更新一项
@@ -452,7 +451,6 @@ public class CourseServiceTest {
         ResponseUpdateCoursePages response = courseService.updateCoursePages(
                 mockSubcourseArrayStr, course.getId(), teacher.getSessionKey());
         log.info(response.getErrMsg());
-        // TODO Assert Error
         assertTrue(response.isSuccess());
         String resSubcourseArrayStr = response.getPages();
         log.info("RES:" + resSubcourseArrayStr);
@@ -471,4 +469,107 @@ public class CourseServiceTest {
             }
         }
     }
+
+    @Test
+    public void testPublishCourseNote() {
+        // 发布公告
+        RequestPublishCourseNote request = mockRequestPublishCourseNote();
+        BaseResponse response = courseService.publishCourseNote(request);
+        log.info("Message: " + response.getErrMsg());
+        assertTrue(response.isSuccess());
+        // 查询公告
+        List<CourseNote> notes = courseNoteDAO.getAllNotes(request.getCourseId());
+        assertNotNull(notes);
+        assertEquals(notes.get(0).getCourseId(), (int)(request.getCourseId()));
+    }
+
+    @Test
+    public void testUpdateCourseNote() {
+        Course course = mockCourseWithTrueTeacher();
+        Teacher teacher = teacherDAO.queryById(course.getTeacherId());
+        RequestPublishCourseNote publishRequest =
+                mockRequestPublishCourseNoteWithTrueCourse(course,CourseNote.TYPE_BULLETIN);
+        courseService.publishCourseNote(publishRequest);
+
+        RequestUpdateCourseNote updateRequest = new RequestUpdateCourseNote();
+        List<CourseNote> notes = courseNoteDAO.getAllNotes(course.getId());
+        CourseNote note = notes.get(0);
+        updateRequest.sessionKey = teacher.getSessionKey();
+        updateRequest.courseNoteId = note.getId();
+        updateRequest.type = note.getType();
+        updateRequest.note = StringUtil.generateRandomString("Note: ");
+        updateRequest.publishTime = note.getPublishTime().getTime();
+
+        BaseResponse response = courseService.updateCourseNote(updateRequest);
+        log.info("Message: " + response.getErrMsg());
+        assertTrue(response.isSuccess());
+        CourseNote newNote = courseNoteDAO.getNoteById(note.getId());
+        assertFalse(note.getNote().equals(newNote.getNote()));
+    }
+
+    @Test
+    public void testGetNotesWithSpecificType() {
+        RequestPublishCourseNote request = mockRequestPublishCourseNoteWithSpecificType(CourseNote.TYPE_HOMEWORK);
+        for (int i = 0; i < 5; ++i) {
+            request.setNote(StringUtil.generateRandomString("Note: "));
+            request.setPublishTime(new Date().getTime());
+            courseService.publishCourseNote(request);
+        }
+        ResponseCourseNotes response = courseService.getNotesWithSpecificType(request.getCourseId(), CourseNote.TYPE_HOMEWORK);
+        log.info("Message: " + response.getErrMsg());
+        assertTrue(response.isSuccess());
+        List<CourseNote> notes = response.getNotes();
+        assertNotNull(notes);
+        for (CourseNote note : notes) {
+            assertEquals(note.getType(), CourseNote.TYPE_HOMEWORK);
+        }
+    }
+
+    @Test
+    public void testGetNotes() {
+        RequestPublishCourseNote request = mockRequestPublishCourseNote();
+        for (int i = 0; i < 5; ++i) {
+            request.setNote(StringUtil.generateRandomString("Note: "));
+            courseService.publishCourseNote(request);
+        }
+        ResponseCourseNotes response = courseService.getNotes(request.getCourseId());
+        log.info("Message: " + response.getErrMsg());
+        assertTrue(response.isSuccess());
+        List<CourseNote> notes = response.getNotes();
+        assertNotNull(notes);
+        assertTrue(notes.size() >= 5);
+    }
+
+    private RequestPublishCourseNote mockRequestPublishCourseNote() {
+        return mockRequestPublishCourseNoteWithSpecificType(new Random().nextInt(3) + 1);
+    }
+
+    private RequestPublishCourseNote mockRequestPublishCourseNoteWithSpecificType(Integer type) {
+        return mockRequestPublishCourseNoteWithTrueCourse(null, type);
+    }
+
+    private RequestPublishCourseNote mockRequestPublishCourseNoteWithTrueCourse(Course course, Integer type)
+            throws IllegalArgumentException {
+        if (course == null) {
+            course = mockCourseWithTrueTeacher();
+        }
+        RequestPublishCourseNote request = new RequestPublishCourseNote();
+        Teacher teacher = teacherDAO.queryById(course.getTeacherId());
+        if (teacher == null) {
+            throw new IllegalArgumentException("Can not find teacher!");
+        }
+        request.sessionKey = teacher.getSessionKey();
+        request.courseId = course.getId();
+        request.note = StringUtil.generateRandomString("Note: ");
+        request.publishTime = new Date().getTime();
+
+        if (type == null) {
+            request.type = new Random().nextInt(3) + 1;
+        } else {
+            request.type = type;
+        }
+        log.info("CourseId: " + request.courseId + " " + request.getNote());
+        return request;
+    }
+
 }

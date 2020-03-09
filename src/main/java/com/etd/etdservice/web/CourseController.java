@@ -1,19 +1,13 @@
 package com.etd.etdservice.web;
 
 import com.etd.etdservice.bean.BaseResponse;
-import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
-import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
-import com.etd.etdservice.bean.course.request.RequestUpdateCoursePages;
-import com.etd.etdservice.bean.course.response.ResponseGetCourses;
-import com.etd.etdservice.bean.course.response.ResponseUpdateCoursePages;
-import com.etd.etdservice.bean.course.response.ResponseUploadMaterial;
-import com.etd.etdservice.bean.course.request.RequestUploadCourse;
-import com.etd.etdservice.bean.course.response.ResponseCourse;
-import com.etd.etdservice.bean.course.response.ResponseUploadCourse;
+import com.etd.etdservice.bean.course.request.*;
+import com.etd.etdservice.bean.course.response.*;
 import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import com.etd.etdservice.serivce.CourseService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -108,4 +102,25 @@ public class CourseController {
 		return service.updateCoursePages(pages, courseId, sessionKey);
 	}
 
+	// TODO course_note controller
+	@RequestMapping(value = "/publish-note", method = RequestMethod.POST)
+	public BaseResponse publishCourseNote(@RequestBody RequestPublishCourseNote request) {
+		return service.publishCourseNote(request);
+	}
+
+	@RequestMapping(value = "/update-note", method = RequestMethod.POST)
+	public BaseResponse updateCourseNote(@RequestBody RequestUpdateCourseNote request) {
+		return service.updateCourseNote(request);
+	}
+
+	@RequestMapping(value = "/all-notes", method = RequestMethod.GET)
+	public ResponseCourseNotes getNotes(@RequestParam("courseId") Integer courseId) {
+		return service.getNotes(courseId);
+	}
+
+	@RequestMapping(value = "specific-notes", method = RequestMethod.GET)
+	public ResponseCourseNotes getNotesWithSpecificType(
+			@RequestParam("courseId") Integer courseId, @RequestParam("type") Integer type) {
+		return service.getNotesWithSpecificType(courseId, type);
+	}
 }

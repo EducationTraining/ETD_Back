@@ -46,6 +46,7 @@ CREATE TABLE students(
   alter table courses modify `score` double DEFAULT 0 COMMENT '课程总评分';
   alter table courses add `course_num` varchar(64) UNIQUE KEY COMMENT '课程编号';
   alter table courses modify `pages` varchar(2048) COMMENT '课程目录json字符串';
+
   CREATE TABLE course_student(
   `id`  int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `course_id`   int(10) UNSIGNED NOT NULL,
@@ -91,4 +92,12 @@ CREATE TABLE students(
   `subcourse_id` int(10) UNSIGNED NOT NULL COMMENT '子课程id',
   UNIQUE KEY(`material_id`, `subcourse_id`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-  
+
+  CREATE TABLE course_note(
+  `id` int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `course_id` int(10) UNSIGNED NOT NULL COMMENT '主课程id',
+  `note` varchar(512) NOT NULL COMMENT '公告的内容',
+  `publish_time` datetime NOT NULL COMMENT '发布时间',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `type` int(10) UNSIGNED DEFAULT 1 COMMENT 'note类型 1为公告 2为测验 3为作业'
+  ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mabatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etd.etdservice.dao.CourseNoteDAO">
+    <!-- 表名 -->
+    <sql id="tb_name">etd_db.course_note</sql>
+    <!--表中所有字段-->
+    <sql id="tb_columns">
+        `id`, `course_id`, `note`, `publish_time`, `create_time`, `type`
+	</sql>
+    <!--更新语句-->
+    <sql id="update_columns">
+        <set>
+            <if test="note!=null"> `note`=#{note}, </if>
+            <if test="publishTime!=null"> `publish_time`=#{publishTime}, </if>
+            <if test="type!=null">`type`=#{type},</if>
+        </set>
+    </sql>
+
+
+    <insert id="publishNote" useGeneratedKeys="true" keyColumn="id" keyProperty="id"
+            parameterType="com.etd.etdservice.bean.course.CourseNote">
+        INSERT INTO <include refid="com.etd.etdservice.dao.CourseNoteDAO.tb_name" />
+        (`course_id`, `note`, `publish_time`, `create_time`, `type`)
+        VALUES
+        (#{courseId}, #{note}, #{publishTime}, #{createTime}, #{type})
+    </insert>
+
+    <update id="updateNote" parameterType="com.etd.etdservice.bean.course.CourseNote">
+        UPDATE <include refid="com.etd.etdservice.dao.CourseNoteDAO.tb_name"/>
+        <include refid="com.etd.etdservice.dao.CourseNoteDAO.update_columns"/>
+        WHERE `id` = #{id}
+    </update>
+
+    <delete id="deleteNote" parameterType="com.etd.etdservice.bean.course.CourseNote">
+        DELETE FROM <include refid="com.etd.etdservice.dao.CourseNoteDAO.tb_name"/>
+        WHERE `id` = #{id}
+    </delete>
+
+    <select id="getNoteById" resultType="com.etd.etdservice.bean.course.CourseNote" >
+        SELECT <include refid="com.etd.etdservice.dao.CourseNoteDAO.tb_columns"/>
+        FROM <include refid="com.etd.etdservice.dao.CourseNoteDAO.tb_name"/>
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="getAllNotes" resultType="com.etd.etdservice.bean.course.CourseNote">
+        SELECT <include refid="com.etd.etdservice.dao.CourseNoteDAO.tb_columns"/>
+        FROM <include refid="com.etd.etdservice.dao.CourseNoteDAO.tb_name"/>
+        WHERE `course_id` = #{courseId}
+    </select>
+
+    <select id="getAllNotesWithSpecificType" resultType="com.etd.etdservice.bean.course.CourseNote">
+        SELECT <include refid="com.etd.etdservice.dao.CourseNoteDAO.tb_columns"/>
+        FROM <include refid="com.etd.etdservice.dao.CourseNoteDAO.tb_name"/>
+        WHERE `course_id` = #{courseId} AND `type` = #{type}
+    </select>
+
+</mapper>

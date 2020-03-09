@@ -27,7 +27,7 @@ public class BaseResponse {
 		this.errMsg = "illegal state is not permitted";
 	}
 
-	public void setFailResponse(int FAIL_NUM) {
+	public BaseResponse setFailResponse(int FAIL_NUM) {
 		this.setSuccess(false);
 		String errorMessage;
 		switch (FAIL_NUM) {
@@ -44,5 +44,6 @@ public class BaseResponse {
 			default: errorMessage = "unknown error";
 		}
 		this.setErrMsg(errorMessage);
+		return this;
 	}
 }
