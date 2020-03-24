@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mabatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.etd.etdservice.dao.CourseStudentRemarkDAO">
+    <!-- 表名 -->
+    <sql id="tb_name">etd_db.course_student_remarks</sql>
+    <!--表中所有字段-->
+    <sql id="tb_columns">
+        `id`, `course_id`, `student_id`, `remark`, `score`
+	</sql>
+    <!--更新语句-->
+    <sql id="update_columns">
+        <set>
+            <if test="score!=null"> `score`=#{score}, </if>
+            <if test="remark!=null"> `remark`=#{remark}</if>
+        </set>
+    </sql>
+
+    <!-- useGeneratedKeys="true"  keyProperty="id"能够自动返回生成的主键 -->
+    <insert id="create" useGeneratedKeys="true"  keyProperty="id">
+        INSERT INTO <include refid="com.etd.etdservice.dao.CourseStudentRemarkDAO.tb_name" />
+        (`course_id`, `student_id`, `remark`, `score`)
+        VALUES
+        (#{courseId}, #{studentId}, #{remark}, #{score})
+    </insert>
+
+    <update id="update" parameterType="com.etd.etdservice.bean.CourseStudentRemark">
+        UPDATE <include refid="com.etd.etdservice.dao.CourseStudentRemarkDAO.tb_name" />
+        <include refid="com.etd.etdservice.dao.CourseStudentRemarkDAO.update_columns" />
+        WHERE `course_id` = #{courseId} AND `student_id` = #{studentId}
+    </update>
+
+    <select id="queryCourseAverageScore" resultType="com.etd.etdservice.bean.course.Course">
+      SELECT `course_id`, avg(`score`) as score
+      FROM <include refid="com.etd.etdservice.dao.CourseStudentRemarkDAO.tb_name" />
+      GROUP BY `course_id`
+    </select>
+
+
+</mapper>

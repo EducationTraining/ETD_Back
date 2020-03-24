@@ -528,6 +528,11 @@ public class CourseServiceImpl implements CourseService {
 		}
 	}
 
+	@Override
+	public BaseResponse updateCourseScore() {
+		return null;
+	}
+
 	private Subcourse getOrCreateSubcourseByTitleAndCourseId(String title, int courseId) {
 		Subcourse subcourse = subcourseDAO.queryByTitleAndCourseId(courseId, title);
 		if (subcourse != null) {

@@ -1,8 +1,11 @@
 package com.etd.etdservice.dao;
 
 import com.etd.etdservice.bean.CourseStudentRemark;
+import com.etd.etdservice.bean.course.Course;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Mapper
 @Repository
@@ -20,4 +23,10 @@ public interface CourseStudentRemarkDAO {
 	 * @return success or not
 	 */
 	boolean update(CourseStudentRemark courseStudentRemark);
+
+	/**
+	 * 根据remark表查询表里课程的平均分
+	 * @return
+	 */
+	List<Course> queryCourseAverageScore();
 }

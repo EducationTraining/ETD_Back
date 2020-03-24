@@ -128,4 +128,10 @@ public interface CourseService {
 	 * @return
 	 */
 	ResponseUpdateCoursePages updateCoursePages(String pages, Integer courseId, String sessionKey);
+
+	/**
+	 * 遍历remark表，更新一遍所有课程的平均分数
+	 * @return
+	 */
+	BaseResponse updateCourseScore();
 }
