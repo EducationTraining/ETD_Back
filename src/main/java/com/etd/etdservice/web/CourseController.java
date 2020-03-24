@@ -4,12 +4,8 @@ import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.request.RequestRemarkCourse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCoursePages;
-import com.etd.etdservice.bean.course.response.ResponseGetCourses;
-import com.etd.etdservice.bean.course.response.ResponseUpdateCoursePages;
-import com.etd.etdservice.bean.course.response.ResponseUploadMaterial;
+import com.etd.etdservice.bean.course.response.*;
 import com.etd.etdservice.bean.course.request.RequestUploadCourse;
-import com.etd.etdservice.bean.course.response.ResponseCourse;
-import com.etd.etdservice.bean.course.response.ResponseUploadCourse;
 import com.etd.etdservice.bean.users.response.ResponseGetStudents;
 import com.etd.etdservice.bean.users.response.ResponseUploadAvatar;
 import com.etd.etdservice.serivce.CourseService;
@@ -52,7 +48,7 @@ public class CourseController {
 	public ResponseUploadMaterial uploadCourseMaterial(@RequestParam("file") MultipartFile video,
 	                                                   @RequestParam("subcourseId")Integer subcourseId,
 	                                                   @RequestParam("sessionKey") String sessionKey) {
-		return service.uploadSubcourseMaterial(video, subcourseId, sessionKey);
+		return service.uploadSubcourseVideoMaterial(video, subcourseId, sessionKey);
 	}
 
 	@RequestMapping(value = "/upload-course", method = RequestMethod.POST)
@@ -106,6 +102,11 @@ public class CourseController {
 		String pages = request.getPages();
 		Integer courseId = request.getCourseId();
 		return service.updateCoursePages(pages, courseId, sessionKey);
+	}
+
+	@RequestMapping(value = "/{subcourseId}/material", method = RequestMethod.GET)
+	public ResponseGetMaterials getMaterials(@PathVariable Integer subcourseId) {
+		return service.getMaterialForSubcourse(subcourseId);
 	}
 
 }

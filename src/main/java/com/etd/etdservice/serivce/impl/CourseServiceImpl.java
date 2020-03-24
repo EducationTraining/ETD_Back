@@ -443,7 +443,7 @@ public class CourseServiceImpl implements CourseService {
 	}
 
 	@Override
-	public ResponseUploadMaterial uploadSubcourseMaterial(MultipartFile video, Integer subcourseId, String sessionKey) {
+	public ResponseUploadMaterial uploadSubcourseVideoMaterial(MultipartFile video, Integer subcourseId, String sessionKey) {
 		if (video == null || subcourseId == null || sessionKey == null) {
 			return new ResponseUploadMaterial(false, "param error", new CourseMaterial());
 		}
@@ -456,16 +456,19 @@ public class CourseServiceImpl implements CourseService {
 		try {
 			String videoUrl = FileHelper.uploadVideo(video, videoRootPath, subcourseId, urlStarter);
 			CourseMaterial courseMaterial = new CourseMaterial();
-			courseMaterial.setVideoUrl(videoUrl);
+			courseMaterial.setMaterialUrl(videoUrl);
+			courseMaterial.setType("video");
 			if (!courseMaterialDAO.create(courseMaterial)) {
-				return new ResponseUploadMaterial(false, "Unable to update material to database", new CourseMaterial());
+				return new ResponseUploadMaterial(false,
+						"Unable to update material to database", new CourseMaterial());
 			}
 			int materialId = courseMaterial.getId();
 			SubcourseToMaterial subcourseToMaterial = new SubcourseToMaterial();
 			subcourseToMaterial.setMaterialId(materialId);
 			subcourseToMaterial.setSubcourseId(subcourseId);
 			if (!subcourseToMaterialDAO.create(subcourseToMaterial)) {
-				return new ResponseUploadMaterial(false, "Unable to update subcourseToMaterial to database", new CourseMaterial());
+				return new ResponseUploadMaterial(false,
+						"Unable to update subcourseToMaterial to database", new CourseMaterial());
 			}
 			return new ResponseUploadMaterial(true, "", courseMaterial);
 		} catch(Exception e) {
@@ -531,6 +534,15 @@ public class CourseServiceImpl implements CourseService {
 	@Override
 	public BaseResponse updateCourseScore() {
 		return null;
+	}
+
+	@Override
+	public ResponseGetMaterials getMaterialForSubcourse(Integer subcourseId) {
+		if (subcourseId == null) {
+			return new ResponseGetMaterials(false, "param error", null);
+		}
+		List<CourseMaterial> materialList = subcourseToMaterialDAO.queryMaterialsBySubcourseId(subcourseId);
+		return new ResponseGetMaterials(true, "", materialList);
 	}
 
 	private Subcourse getOrCreateSubcourseByTitleAndCourseId(String title, int courseId) {

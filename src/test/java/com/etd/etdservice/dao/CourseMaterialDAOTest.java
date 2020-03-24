@@ -27,7 +27,7 @@ public class CourseMaterialDAOTest {
 
 	public static CourseMaterial mockCourseMaterialDAO() {
 		CourseMaterial courseMaterial = new CourseMaterial();
-		courseMaterial.setVideoUrl(StringUtil.generateRandomString("videoUrl"));
+		courseMaterial.setMaterialUrl(StringUtil.generateRandomString("url"));
 		return courseMaterial;
 	}
 }

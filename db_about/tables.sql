@@ -77,6 +77,8 @@ CREATE TABLE students(
   `id`  int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `video_url` varchar(256) COMMENT '课程视频url'
   ) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  alter table course_materials add `type` varchar(255);
+  alter table course_materials change `video_url` `material_url` varchar(255);
   
   CREATE TABLE subcourses(
   `id`  int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,

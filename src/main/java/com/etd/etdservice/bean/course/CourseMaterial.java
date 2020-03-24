@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CourseMaterial {
 	private int id;
-	private String videoUrl;
+	private String materialUrl;
+	private String type;
 }
