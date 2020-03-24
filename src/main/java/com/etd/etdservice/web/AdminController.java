@@ -5,6 +5,8 @@ import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.request.RequestUpdateCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.users.requests.RequestRegister;
+import com.etd.etdservice.bean.users.requests.RequestUpdateStudent;
+import com.etd.etdservice.bean.users.requests.RequestUpdateStudentByAdmin;
 import com.etd.etdservice.bean.users.response.ResponseGetAdmin;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
 import com.etd.etdservice.serivce.AdminService;
@@ -51,6 +53,14 @@ public class AdminController {
         Integer status = requestUpdateCourse.getStatus();
         String sessionKey = requestUpdateCourse.getSessionKey();
         return service.updateCourseStatus(courseId, status, sessionKey);
+    }
+
+    @RequestMapping(value = "/update/student", method = RequestMethod.POST)
+    public BaseResponse updateStudentStatus(@RequestBody RequestUpdateStudentByAdmin requestUpdateStudentByAdmin) {
+        Integer studentId = requestUpdateStudentByAdmin.getId();
+        Boolean status = requestUpdateStudentByAdmin.isValid();
+        String sessionKey = requestUpdateStudentByAdmin.getAdminSessionKey();
+        return service.updateStudentStatus(studentId,status,sessionKey);
     }
 
 }

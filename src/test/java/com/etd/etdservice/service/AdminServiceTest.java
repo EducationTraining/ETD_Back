@@ -3,10 +3,12 @@ package com.etd.etdservice.service;
 
 import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
+import com.etd.etdservice.bean.users.Student;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetAdmin;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
 import com.etd.etdservice.dao.CourseDAO;
+import com.etd.etdservice.dao.StudentDAO;
 import com.etd.etdservice.dao.TeacherDAO;
 import com.etd.etdservice.serivce.AdminService;
 import com.etd.etdservice.utils.DoubleUtil;
@@ -36,6 +38,9 @@ public class AdminServiceTest {
 
     @Autowired
     private TeacherDAO teacherDAO;
+
+    @Autowired
+    private StudentDAO studentDAO;
 
     @Test
     public void testRegister() {
@@ -137,6 +142,24 @@ public class AdminServiceTest {
 
         course = courseDAO.queryById(course.getId());
         Assert.assertNull(course);
+    }
+
+    @Test
+    public void testUpdateStudentStatus() {
+        // 插入一条管理员信息
+        String adminName = StringUtil.generateRandomString("admin");
+        String adminPassWord = StringUtil.generateRandomString("password");
+        String sessionKeyOfAdmin = adminService.register(adminName, adminPassWord).getSessionKey();
+        // 插入一条学生信息
+        String studentName = StringUtil.generateRandomString("student");
+        String studentSessionKey = StringUtil.generateRandomString("sessionKey");
+        Student student = new Student();
+        student.setUserName(studentName);
+        student.setSessionKey(studentSessionKey);
+        student.setCreateTime(new Date());
+        studentDAO.create(student);
+        // 调用service层方法，判断返回值是否符合预期
+        assertTrue(adminService.updateStudentStatus(studentDAO.queryBySessionKey(studentSessionKey).getId(),false, sessionKeyOfAdmin).isSuccess());
     }
 
     @Test
