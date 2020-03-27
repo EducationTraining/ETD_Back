@@ -42,6 +42,7 @@ public class CourseDAOTest {
 		course.setNote(StringUtil.generateRandomString("note"));
 		course.setPages(StringUtil.generateRandomString("pages"));
 		course.setScore(DoubleUtil.nextDouble(0, 5));
+		course.setCategoryId(5);
 		return course;
 	}
 
@@ -111,6 +112,19 @@ public class CourseDAOTest {
 		mockCourse = courseDAO.queryById(mockCourse.getId());
 		Assert.assertNull(mockCourse);
 
+	}
+
+	@Test
+	public void testGetCoursesByCategory() {
+		for (int i = 0; i < 3; i++) {
+			Course course = mockCourse();
+			courseDAO.create(course);
+		}
+		// 由于mockCourse的categoryID是5，所以用5查
+		List<Course> courses = courseDAO.getCoursesByCategory(5);
+		for (Course course : courses) {
+			log.info(course.getName());
+		}
 	}
 
 }

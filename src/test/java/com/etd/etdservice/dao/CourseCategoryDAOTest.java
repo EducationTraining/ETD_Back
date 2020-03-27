@@ -50,6 +50,7 @@ public class CourseCategoryDAOTest {
         int categoryId = courseCategory.getCategoryId();
         courseCategoryDAO.addCourseCategory(courseCategory);
         courseCategoryDAO.updateCategoryName(categoryId,"updateName");
+        assertEquals("updateName", courseCategoryDAO.queryCategoryById(categoryId).getCategoryName());
     }
 
     @Test

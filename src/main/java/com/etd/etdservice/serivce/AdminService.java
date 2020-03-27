@@ -78,4 +78,12 @@ public interface AdminService {
 	 * @return
 	 */
 	BaseResponse deleteCourseCategory(int categoryId, String sessionKey);
+
+	/**
+	 * 查询某一类的所有课程
+	 * @param sessionKey
+	 * @param categoryId
+	 * @return
+	 */
+    ResponseGetCourses getCoursesByCategory(String sessionKey, Integer categoryId);
 }

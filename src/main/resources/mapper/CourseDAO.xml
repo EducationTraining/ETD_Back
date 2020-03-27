@@ -8,7 +8,7 @@
     <!--表中所有字段-->
     <sql id="tb_columns">
         `id`, `course_num`, `teacher_id`, `name`, `score`, `pages`, `start_time`,
-	    `weeks`, `status`, `description`, `create_time`, `note`, `avatar_url`
+	    `weeks`, `status`, `description`, `create_time`, `note`, `avatar_url`, `category_id`
 	</sql>
     <!--更新语句-->
     <sql id="update_columns">
@@ -23,6 +23,7 @@
             <if test="status!=null">`status`=#{status},</if>
             <if test="description!=null">`description`=#{description},</if>
             <if test="note!=null">`note`=#{note}</if>
+            <if test="categoryId!=null">`category_id`=#{categoryID}</if>
         </set>
     </sql>
 
@@ -84,15 +85,21 @@
 
     <insert id="create" useGeneratedKeys="true"  keyProperty="id" parameterType="com.etd.etdservice.bean.course.Course">
         INSERT INTO <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
-        (`teacher_id`, `course_num`, `name`, `pages`, `start_time`, `weeks`, `description`, `create_time`, `note`)
+        (`teacher_id`, `course_num`, `name`, `pages`, `start_time`, `weeks`, `description`, `create_time`, `note`, `category_id`)
         VALUES
-        (#{teacherId}, #{courseNum}, #{name}, #{pages}, #{startTime}, #{weeks}, #{description}, #{createTime}, #{note})
+        (#{teacherId}, #{courseNum}, #{name}, #{pages}, #{startTime}, #{weeks}, #{description}, #{createTime}, #{note}, #{categoryId})
     </insert>
 
     <select id="queryTeacherByCourseId" resultType="com.etd.etdservice.bean.users.Teacher">
         SELECT t.*
         FROM courses c, teachers t
         WHERE c.`id` = #{courseId} AND c.`teacher_id`=t.`id`;
+    </select>
+
+    <select id="getCoursesByCategory" resultType="com.etd.etdservice.bean.course.Course">
+        SELECT <include refid="com.etd.etdservice.dao.CourseDAO.tb_columns" />
+        FROM <include refid="com.etd.etdservice.dao.CourseDAO.tb_name" />
+        WHERE `category_id` = #{categoryId}
     </select>
 
 </mapper>

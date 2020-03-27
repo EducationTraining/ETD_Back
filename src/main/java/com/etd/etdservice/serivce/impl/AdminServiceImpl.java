@@ -43,6 +43,26 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private CourseCategoryDAO courseCategoryDAO;
 
+
+    private ResponseGetCourses fromCourses(List<Course> courses) {
+        List<ResponseCourse> courseList = new ArrayList<>();
+        if(courses == null || courses.size() == 0) {
+            return new ResponseGetCourses(false, "no selected courses!", courseList);
+        }
+        for(Course course : courses) {
+            Teacher teacher = teacherDAO.queryById(course.getTeacherId());
+            log.info("teacher: " + teacher + " course: " + course);
+
+            ResponseGetTeacher responseGetTeacher = ResponseGetTeacher.fromBeanToResponse(teacher);
+            Integer studentNum = courseStudentDAO.getStudentCountsByCourseId(course.getId());
+            String processedPages = processOriginalPages(course.getPages());
+            log.info(processedPages);
+            ResponseCourse responseCourse = ResponseCourse.fromBeanToResponse(course, responseGetTeacher, studentNum, processedPages);
+            courseList.add(responseCourse);
+        }
+        return new ResponseGetCourses(true, "", courseList);
+    }
+
     /**
      * 管理员获取所有课程
      * @param sessionKey 管理员sessionKey
@@ -273,31 +293,57 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
+    @Override
+    public ResponseGetCourses getCoursesByCategory(String sessionKey, Integer categoryId) {
+        // 如果sessionKey为null，则直接返回失败
+        if (sessionKey == null) {
+            return new ResponseGetCourses(false, "sessionKey error", null);
+        }
+        // 如果该sessionKey不存在，返回失败：没有管理员权限
+        Admin resAdmin = adminDAO.queryBySessionKey(sessionKey);
+        if (resAdmin == null) {
+            return new ResponseGetCourses(false, "Admin not found !", null);
+        }
+
+        // 获取该类下的所有课程
+        List<Course> courses = courseDAO.getCoursesByCategory(categoryId);
+        ResponseGetCourses responseGetCourses = fromCourses(courses);
+        return responseGetCourses;
+    }
+
     /**
      * 将只含id subcourse目录json字符串处理为含完整信息的目录json字符串
      * @param pages
      * @return
      */
     private String processOriginalPages(String pages) {
-        JSONArray subcourseArray = JSON.parseArray(pages);
-        // 遍历每一个一级子课程
-        for (int i=0; i<subcourseArray.size(); i++) {
-            JSONObject firstSubcourseObj = subcourseArray.getJSONObject(i);
-            // 为每个一级子课程查询子课程信息
-            Integer id = firstSubcourseObj.getInteger("id");
-            Subcourse firstSubcourse = subcourseDAO.queryById(id);
-            firstSubcourseObj.put("title", firstSubcourse.getTitle());
-            // 遍历二级子课程
-            JSONArray secondSubcourses = firstSubcourseObj.getJSONArray("subcourses");
-            for (int j=0; j<secondSubcourses.size(); j++) {
-                // 为每个二级子课程查询子课程信息
-                JSONObject secondSubcourseObj = subcourseArray.getJSONObject(j);
-                Integer secondId = secondSubcourseObj.getInteger("id");
-                Subcourse secondSubcourse = subcourseDAO.queryById(secondId);
-                secondSubcourseObj.put("title", secondSubcourse.getTitle());
-            }
+        if (pages == null || pages.equals("")) {
+            return pages;
         }
-        return JSON.toJSONString(subcourseArray);
+        try {
+            JSONArray subcourseArray = JSON.parseArray(pages);
+            // 遍历每一个一级子课程
+            for (int i = 0; i < subcourseArray.size(); i++) {
+                JSONObject firstSubcourseObj = subcourseArray.getJSONObject(i);
+                // 为每个一级子课程查询子课程信息
+                Integer id = firstSubcourseObj.getInteger("id");
+                Subcourse firstSubcourse = subcourseDAO.queryById(id);
+                firstSubcourseObj.put("title", firstSubcourse.getTitle());
+                // 遍历二级子课程
+                JSONArray secondSubcourses = firstSubcourseObj.getJSONArray("subcourses");
+                for (int j = 0; j < secondSubcourses.size(); j++) {
+                    // 为每个二级子课程查询子课程信息
+                    JSONObject secondSubcourseObj = secondSubcourses.getJSONObject(j);
+                    Integer secondId = secondSubcourseObj.getInteger("id");
+                    Subcourse secondSubcourse = subcourseDAO.queryById(secondId);
+                    secondSubcourseObj.put("title", secondSubcourse.getTitle());
+                }
+            }
+            return JSON.toJSONString(subcourseArray);
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            return pages;
+        }
     }
 
 }

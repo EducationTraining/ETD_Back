@@ -53,15 +53,21 @@ public class AdminController {
     }
 
     // 修改课程类别
-    @RequestMapping(value = "/session-key/{sessionKey}/updateCourseCategory", method = RequestMethod.POST)
+    @RequestMapping(value = "/session-key/{sessionKey}/admin/updateCourseCategory", method = RequestMethod.PUT)
     public BaseResponse updateCourseCategory(@PathVariable String sessionKey, @RequestParam("categoryId") Integer categoryId, @RequestParam("categoryName") String categoryName ){
         return service.updateCourseCategory(categoryId, categoryName, sessionKey);
     }
 
     // 查询所有课程类别
-    @RequestMapping(value = "/session-key/{sessionKey}/admin/getCoursesCategories", method = RequestMethod.POST)
+    @RequestMapping(value = "/session-key/{sessionKey}/admin/getCoursesCategories", method = RequestMethod.GET)
     public ResponseGetCoursesCategories getAllCoursesCategories(@PathVariable String sessionKey) {
         return service.getAllCoursesCategories(sessionKey);
+    }
+
+    // 查询某一类所有课程
+    @RequestMapping(value = "/session-key/{sessionKey}/admin/getCoursesByCategory", method = RequestMethod.GET)
+    public ResponseGetCourses getCoursesByCategory(@PathVariable("sessionKey") String sessionKey, @RequestParam("categoryId") Integer categoryId) {
+        return service.getCoursesByCategory(sessionKey, categoryId);
     }
 
     // 增加课程类别
@@ -71,7 +77,7 @@ public class AdminController {
     }
 
     // 删除课程类别
-    @RequestMapping(value = "/session-key/{sessionKey}/admin/deleteCourseCategory", method = RequestMethod.POST)
+    @RequestMapping(value = "/session-key/{sessionKey}/admin/deleteCourseCategory", method = RequestMethod.DELETE)
     public BaseResponse deleteCourseCategory(@PathVariable String sessionKey, @RequestParam("categoryId") int categoryId){
         return service.deleteCourseCategory(categoryId, sessionKey);
     }

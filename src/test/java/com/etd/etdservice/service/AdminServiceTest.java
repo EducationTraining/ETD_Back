@@ -4,16 +4,15 @@ package com.etd.etdservice.service;
 import com.etd.etdservice.bean.BaseResponse;
 import com.etd.etdservice.bean.course.Course;
 import com.etd.etdservice.bean.course.CourseCategory;
+import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.course.response.ResponseGetCourses;
 import com.etd.etdservice.bean.course.response.ResponseGetCoursesCategories;
 import com.etd.etdservice.bean.users.Teacher;
 import com.etd.etdservice.bean.users.response.ResponseGetAdmin;
 import com.etd.etdservice.bean.users.response.ResponseRegister;
-import com.etd.etdservice.dao.CourseCategoryDAO;
-import com.etd.etdservice.dao.CourseCategoryDAOTest;
-import com.etd.etdservice.dao.CourseDAO;
-import com.etd.etdservice.dao.TeacherDAO;
+import com.etd.etdservice.dao.*;
 import com.etd.etdservice.serivce.AdminService;
+import com.etd.etdservice.serivce.CourseService;
 import com.etd.etdservice.utils.DoubleUtil;
 import com.etd.etdservice.utils.MD5Util;
 import com.etd.etdservice.utils.StringUtil;
@@ -238,4 +237,22 @@ public class AdminServiceTest {
         assertEquals("", baseResponse.getErrMsg());
     }
 
+    @Test
+    public void getCoursesByCategory() {
+        // 插入一条管理员信息
+        String adminName = StringUtil.generateRandomString("admin");
+        String adminPassWord = StringUtil.generateRandomString("password");
+        String sessionKeyOfAdmin = adminService.register(adminName, adminPassWord).getSessionKey();
+        // 增加一个课程类别
+        for (int i = 0; i < 2; i++) {
+            Course course = CourseDAOTest.mockCourse();
+            course.setCategoryId(66);
+            courseDAO.create(course);
+        }
+        ResponseGetCourses coursesByCategory = adminService.getCoursesByCategory(sessionKeyOfAdmin, 66);
+        for (ResponseCourse responseCourse : coursesByCategory.getCoursesList()) {
+            assertEquals((Integer)66, responseCourse.getCategoryId());
+        }
+
+    }
 }

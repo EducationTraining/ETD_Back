@@ -41,8 +41,8 @@
 
     <update id="updateCategoryName">
         UPDATE <include refid="com.etd.etdservice.dao.CourseCategoryDAO.tb_name"/>
-        SET `category_name` = #{param2}
-        WHERE `category_id` = #{param1}
+        SET `category_name` = #{categoryName}
+        WHERE `category_id` = #{categoryId}
     </update>
 
     <select id="queryCategoryById" resultType="com.etd.etdservice.bean.course.CourseCategory">

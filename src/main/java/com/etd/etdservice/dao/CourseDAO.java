@@ -1,6 +1,7 @@
 package com.etd.etdservice.dao;
 
 import com.etd.etdservice.bean.course.Course;
+import com.etd.etdservice.bean.course.response.ResponseCourse;
 import com.etd.etdservice.bean.users.Teacher;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
@@ -79,4 +80,11 @@ public interface CourseDAO {
 	 * @return
 	 */
 	boolean deleteByCourseId(int id);
+
+	/**
+	 * 查询某一类的所有课程
+	 * @param categoryId
+	 * @return
+	 */
+	List<Course> getCoursesByCategory(Integer categoryId);
 }
