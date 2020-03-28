@@ -18,7 +18,7 @@
     </insert>
 
     <select id="queryMaterialsBySubcourseId" resultType="com.etd.etdservice.bean.course.CourseMaterial">
-        SELECT a.id, a.video_url
+        SELECT a.id, a.material_url
         FROM
         <include refid="com.etd.etdservice.dao.CourseMaterialDAO.tb_name"/> a,
         <include refid="com.etd.etdservice.dao.SubcourseToMaterialDAO.tb_name"/> b
