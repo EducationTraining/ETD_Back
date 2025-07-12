@@ -16,7 +16,7 @@
     <description>Backend support for ETD.</description>
 
     <properties>
-        <commons-lang3.version>3.5</commons-lang3.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
         <java.version>1.8</java.version>
     </properties>
 
